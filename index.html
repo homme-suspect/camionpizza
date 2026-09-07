@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Camion Pizza | Pizza au feu de bois</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <header>
+      <a href="#accueil" class="logo-link">
+        <img
+          src="image/logo-transparent.png"
+          alt="Camion Pizza - Pizza au feu de bois"
+          class="logo-img"
+        />
+      </a>
+
+      <nav>
+        <a href="#accueil">Accueil</a>
+        <a href="#carte">La carte</a>
+        <a href="#emplacements">Emplacements</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- =========================
+           ACCUEIL
+      ========================== -->
+      <section id="accueil" class="hero">
+        <div class="hero-content">
+          <p class="subtitle">Pizzas artisanales au feu de bois</p>
+
+          <h1>CAMION PIZZA</h1>
+
+          <p class="description">
+            Retrouvez-nous chaque semaine dans votre ville et commandez votre
+            pizza préférée.
+          </p>
+
+          <div class="buttons">
+            <a href="#carte" class="btn btn-secondary"> Voir la carte </a>
+
+            <a href="tel:+33786966498" class="btn btn-primary"> Commander </a>
+          </div>
+
+          <!-- Emplacement du jour -->
+          <div class="today-home">
+            <span class="today-dot"></span>
+
+            <div>
+              <p class="today-title">AUJOURD'HUI</p>
+              <p id="today-location">Chargement...</p>
+              <p id="today-hours"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================
+           CARTE DES PIZZAS
+      ========================== -->
+      <section id="carte" class="menu-section">
+        <div class="menu-header">
+          <p class="menu-small-title">PIZZAS AU FEU DE BOIS</p>
+
+          <h2>NOTRE CARTE</h2>
+
+          <p>Ingrédient supplémentaire + 1 €</p>
+
+          <a
+            href="documents/carte-pizzas.pdf"
+            download="Carte-Camion-Pizza.pdf"
+            class="download-menu"
+          >
+            Télécharger la carte PDF ↓
+          </a>
+        </div>
+
+        <div class="menu-tabs">
+          <button class="menu-tab active" data-category="tomate">
+            Base tomate
+          </button>
+
+          <button class="menu-tab" data-category="creme">Base crème</button>
+
+          <button class="menu-tab" data-category="pecheurs">Pêcheurs</button>
+        </div>
+
+        <!-- Les pizzas sont générées par script.js -->
+        <div id="pizza-menu" class="pizza-menu"></div>
+      </section>
+
+      <!-- =========================
+           EMPLACEMENTS
+      ========================== -->
+      <section id="emplacements" class="emplacements">
+        <div class="locations-container">
+          <h2>OÙ NOUS TROUVER ?</h2>
+
+          <div class="locations-grid">
+            <div class="location-card">
+              <h3>Mercredi</h3>
+              <p>Béthisy-Saint-Martin</p>
+              <span>17h – 21h</span>
+            </div>
+
+            <div class="location-card">
+              <h3>Jeudi</h3>
+              <p>Moru</p>
+              <span>18h – 21h</span>
+            </div>
+
+            <div class="location-card">
+              <h3>Vendredi</h3>
+              <p>Cinqueux</p>
+              <span>17h – 21h</span>
+            </div>
+
+            <div class="location-card">
+              <h3>Samedi</h3>
+              <p>Saint-Sauveur</p>
+              <span>17h – 21h</span>
+            </div>
+
+            <div class="location-card">
+              <h3>Dimanche</h3>
+              <p>Pont-Sainte-Maxence</p>
+              <span>18h – 22h</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================
+           CONTACT
+      ========================== -->
+      <section id="contact" class="contact">
+        <h2>UNE PIZZA CE SOIR ?</h2>
+
+        <p>Commandez directement par téléphone</p>
+
+        <a href="tel:+33786966498" class="call-button"> 📞 07 86 96 64 98 </a>
+      </section>
+    </main>
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+    <footer>
+      <div class="footer-content">
+        <a href="#accueil">
+          <img
+            src="image/logo-footer.png"
+            alt="La Maison de la Pizza"
+            class="footer-logo"
+          />
+        </a>
+
+        <div class="footer-links">
+          <a href="#accueil">Accueil</a>
+          <a href="#carte">La carte</a>
+          <a href="#emplacements">Emplacements</a>
+        </div>
+
+        <div class="footer-contact">
+          <p>Commandes par téléphone</p>
+
+          <a href="tel:+33786966498"> 07 86 96 64 98 </a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 La Maison de la Pizza • Tous droits réservés</p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
