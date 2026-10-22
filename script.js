@@ -288,6 +288,8 @@
     return d + "Z";
   }
 
+  // Pizza détaillée sur planche en bois. Chaque garniture est dans un groupe .top
+  // pour pouvoir « tomber » sur la pizza à l'ouverture (voir style.css).
   function buildPizza(svg) {
     const rand = rng(11);
     const R = (a, b) => a + rand() * (b - a);
@@ -304,132 +306,192 @@
       }
       return smoothPath(pts);
     };
+    // Place des points sans qu'ils se chevauchent trop
+    const placed = [];
+    const spot = (rMin, rMax, gap) => {
+      for (let t = 0; t < 60; t++) {
+        const p = polar(R(rMin, rMax), R(0, TAU));
+        if (placed.every((q) => Math.hypot(p[0] - q[0], p[1] - q[1]) > gap)) {
+          placed.push(p);
+          return p;
+        }
+      }
+      return polar(R(rMin, rMax), R(0, TAU));
+    };
 
+    let i = 0; // ordre d'apparition des garnitures
     let art = "";
 
-    // Pâte
-    art += `<path d="${blob(0, 0, 288, 3.5, 44)}" fill="url(#pz-crust)"/>`;
-    for (let i = 0; i < 16; i++) {
-      const a = R(0, TAU);
-      const [x, y] = polar(R(266, 280), a);
-      art += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(R(9, 18))}" ry="${f(R(5, 8))}" transform="rotate(${f(
-        deg(a) + 90
-      )} ${f(x)} ${f(y)})" fill="#f6cf91" opacity=".5"/>`;
+    // Planche en bois
+    art += `<circle r="306" fill="url(#pz-board)"/>`;
+    for (let k = 0; k < 16; k++) {
+      const r = 284 + k * 1.4;
+      art += `<ellipse rx="${f(r)}" ry="${f(r * R(0.97, 1))}" transform="rotate(${f(R(0, 180))})" fill="none" stroke="#3a2210" stroke-opacity="${f(R(0.08, 0.2))}" stroke-width="${f(R(0.6, 1.6))}"/>`;
     }
-    // Marques du feu de bois
-    for (let i = 0; i < 40; i++) {
-      const a = R(0, TAU);
-      const [x, y] = polar(R(256, 287), a);
-      const s = R(4, 14);
-      art += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(s)}" ry="${f(s * R(0.45, 0.8))}" transform="rotate(${f(
-        deg(a) + 90
-      )} ${f(x)} ${f(y)})" fill="url(#pz-char)"/>`;
+    art += `<circle r="304" fill="none" stroke="#2c190b" stroke-opacity=".5" stroke-width="4"/>`;
+    // farine sur la planche
+    for (let k = 0; k < 70; k++) {
+      const [x, y] = polar(R(272, 300), R(0, TAU));
+      art += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(R(0.6, 1.8))}" fill="#f4e6cc" opacity="${f(R(0.25, 0.6))}"/>`;
     }
-    art += `<circle r="252" fill="none" stroke="#6b3311" stroke-opacity=".4" stroke-width="10"/>`;
+
+    // Croûte
+    art += `<path d="${blob(0, 0, 268, 4, 46)}" fill="url(#pz-crust)"/>`;
+    art += `<path d="${blob(0, 0, 262, 3, 40)}" fill="none" stroke="#f7d79c" stroke-opacity=".35" stroke-width="5"/>`;
+    // cloques de pâte avec le dessus grillé
+    for (let k = 0; k < 22; k++) {
+      const a = R(0, TAU);
+      const [x, y] = polar(R(244, 262), a);
+      const w = R(10, 22);
+      const rot = f(deg(a) + 90);
+      art += `<g transform="translate(${f(x)} ${f(y)}) rotate(${rot})">
+        <ellipse rx="${f(w)}" ry="${f(w * 0.45)}" fill="#f5cf8e" opacity=".55"/>
+        <ellipse rx="${f(w * 0.45)}" ry="${f(w * 0.16)}" cy="${f(-w * 0.26)}" fill="url(#pz-char)" opacity=".7"/>
+      </g>`;
+    }
+    // marques du feu de bois
+    for (let k = 0; k < 46; k++) {
+      const a = R(0, TAU);
+      const [x, y] = polar(R(246, 268), a);
+      const s = R(2.5, 8);
+      art += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(s)}" ry="${f(s * R(0.35, 0.6))}" opacity="${f(R(0.5, 0.85))}" transform="rotate(${f(deg(a) + 90)} ${f(x)} ${f(y)})" fill="url(#pz-char)"/>`;
+    }
+    // ombre au bord de la sauce
+    art += `<circle r="234" fill="none" stroke="#5a2a0e" stroke-opacity=".45" stroke-width="12"/>`;
 
     // Sauce tomate
-    art += `<path d="${blob(0, 0, 248, 5, 40)}" fill="url(#pz-sauce)"/>`;
-    for (let i = 0; i < 28; i++) {
-      const [x, y] = polar(R(0, 236), R(0, TAU));
-      art += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(R(1.5, 4.5))}" fill="#8e180b" opacity=".45"/>`;
+    art += `<path d="${blob(0, 0, 230, 6, 40)}" fill="url(#pz-sauce)"/>`;
+    for (let k = 0; k < 14; k++) {
+      const [x, y] = polar(R(20, 200), R(0, TAU));
+      art += `<path d="M${f(x)} ${f(y)}q${f(R(-20, 20))} ${f(R(-12, 12))} ${f(R(-30, 30))} ${f(R(-10, 10))}" fill="none" stroke="#9a1a0c" stroke-opacity=".35" stroke-width="${f(R(2, 5))}" stroke-linecap="round"/>`;
+    }
+    for (let k = 0; k < 40; k++) {
+      const [x, y] = polar(R(0, 222), R(0, TAU));
+      art += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(R(1.2, 3.8))}" fill="#e8553a" opacity=".5"/>`;
     }
 
-    // Mozzarella
-    const cheeses = [[R(-10, 10), R(-10, 10), 48]];
-    for (let k = 0; k < 7; k++) {
-      const [x, y] = polar(R(120, 160), (k / 7) * TAU + R(-0.2, 0.2));
-      cheeses.push([x, y, R(36, 50)]);
-    }
+    // Mozzarella fondue, dorée par endroits
+    const cheeses = [[R(-8, 8), R(-8, 8), 44]];
     for (let k = 0; k < 6; k++) {
-      const [x, y] = polar(R(200, 210), (k / 6) * TAU + 0.45 + R(-0.15, 0.15));
-      cheeses.push([x, y, R(18, 25)]);
+      const [x, y] = polar(R(100, 130), (k / 6) * TAU + R(-0.2, 0.2));
+      cheeses.push([x, y, R(34, 44)]);
     }
+    for (let k = 0; k < 7; k++) {
+      const [x, y] = polar(R(178, 196), (k / 7) * TAU + 0.4 + R(-0.15, 0.15));
+      cheeses.push([x, y, R(22, 30)]);
+    }
+    cheeses.forEach(([x, y, s]) => placed.push([x, y]));
     cheeses.forEach(([x, y, s]) => {
-      art += `<path d="${blob(x, y, s, s * 0.2, 9)}" fill="url(#pz-cheese)"/>`;
-      for (let j = 0; j < 2; j++) {
-        art += `<circle cx="${f(x + R(-s / 2, s / 2))}" cy="${f(y + R(-s / 2, s / 2))}" r="${f(
-          R(5, s / 3.5)
-        )}" fill="url(#pz-toast)"/>`;
+      let blisters = "";
+      for (let j = 0; j < 4; j++) {
+        blisters += `<circle cx="${f(x + R(-s / 1.8, s / 1.8))}" cy="${f(y + R(-s / 1.8, s / 1.8))}" r="${f(R(3, s / 3.2))}" fill="url(#pz-toast)"/>`;
       }
+      art += `<g class="top" style="--i:${i++}">
+        <path d="${blob(x, y, s + 3, s * 0.22, 10)}" fill="#e9c27a" opacity=".55"/>
+        <path d="${blob(x, y, s, s * 0.2, 10)}" fill="url(#pz-cheese)"/>
+        ${blisters}
+        <path d="M${f(x - s * 0.45)} ${f(y - s * 0.3)}q${f(s * 0.3)} ${f(-s * 0.3)} ${f(s * 0.7)} ${f(-s * 0.15)}" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3" stroke-linecap="round"/>
+      </g>`;
     });
 
-    // Olives
-    for (let i = 0; i < 9; i++) {
-      const [x, y] = polar(R(45, 215), (i / 9) * TAU + R(-0.3, 0.3));
-      art += `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(R(0, 360))})">
+    // Tomates cerises coupées en deux
+    for (let k = 0; k < 7; k++) {
+      const [x, y] = spot(60, 205, 46);
+      let seeds = "";
+      for (let j = 0; j < 3; j++) {
+        const a = (j / 3) * TAU + 0.5;
+        seeds += `<ellipse cx="${f(Math.cos(a) * 6)}" cy="${f(Math.sin(a) * 6)}" rx="3.6" ry="2.2" transform="rotate(${f(deg(a))} ${f(Math.cos(a) * 6)} ${f(Math.sin(a) * 6)})" fill="#ffd8a0" opacity=".9"/>`;
+      }
+      art += `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(R(0, 360))})"><g class="top" style="--i:${i++}">
+        <circle r="17" fill="#000" opacity=".18" cx="2" cy="3"/>
+        <circle r="16" fill="url(#pz-tomato)"/>
+        <circle r="12" fill="#f0603f"/>
+        <circle r="4" fill="#ff8a6a"/>
+        ${seeds}
+        <path d="M-10 -9A14 14 0 0 1 4 -14" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round"/>
+      </g></g>`;
+    }
+
+    // Olives noires
+    for (let k = 0; k < 8; k++) {
+      const [x, y] = spot(40, 212, 34);
+      art += `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(R(0, 360))})"><g class="top" style="--i:${i++}">
         <circle r="11" fill="url(#pz-olive)"/>
-        <ellipse rx="4.2" ry="3.6" fill="#7a2011"/>
-        <path d="M-6 -5A8 8 0 0 1 3 -8" stroke="#fff" stroke-opacity=".35" stroke-width="2" fill="none" stroke-linecap="round"/>
-      </g>`;
+        <ellipse rx="4.4" ry="3.8" fill="#6b1b0e"/>
+        <path d="M-6 -5A8 8 0 0 1 3 -8" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="2" stroke-linecap="round"/>
+      </g></g>`;
     }
 
-    // Basilic
-    const leaf = "M0 -27C15 -19 17 9 0 29C-17 9 -15 -19 0 -27Z";
-    for (let i = 0; i < 7; i++) {
-      const [x, y] = polar(R(55, 200), (i / 7) * TAU + R(0, 0.7));
-      art += `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(R(0, 360))}) scale(${f(R(0.75, 1.05))})">
+    // Feuilles de basilic
+    const leaf = "M0 -32C18 -22 20 10 0 34C-20 10 -18 -22 0 -32Z";
+    for (let k = 0; k < 8; k++) {
+      const [x, y] = spot(30, 200, 40);
+      art += `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(R(0, 360))}) scale(${f(R(0.7, 1))})"><g class="top" style="--i:${i++}">
+        <path d="${leaf}" fill="#000" opacity=".2" transform="translate(3 4)"/>
         <path d="${leaf}" fill="url(#pz-basil)"/>
-        <path d="M0 -22V24M0 -6L8 -12M0 4L-9 -3M0 13L8 7" stroke="#1d4f22" stroke-opacity=".55" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-      </g>`;
+        <path d="M0 -27V29M0 -14L9 -20M0 -4L-10 -11M0 7L10 0M0 17L-9 11" fill="none" stroke="#1b4a1f" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M-6 -18C-10 -6 -9 6 -4 16" fill="none" stroke="#b6e3a4" stroke-opacity=".4" stroke-width="2" stroke-linecap="round"/>
+      </g></g>`;
     }
 
-    // Brillance de l'huile
-    for (let i = 0; i < 12; i++) {
-      const [x, y] = polar(R(20, 230), R(0, TAU));
-      art += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(R(3, 8))}" ry="${f(R(1.5, 3))}" transform="rotate(${f(
-        R(0, 180)
-      )} ${f(x)} ${f(y)})" fill="#fff" opacity=".18"/>`;
+    // Origan
+    let oregano = "";
+    for (let k = 0; k < 90; k++) {
+      const [x, y] = polar(R(0, 222), R(0, TAU));
+      oregano += `<rect x="${f(x)}" y="${f(y)}" width="${f(R(1.5, 3.5))}" height="${f(R(1, 2))}" transform="rotate(${f(R(0, 180))} ${f(x)} ${f(y)})" fill="${rand() > 0.5 ? "#4a5a24" : "#6b7a32"}"/>`;
+    }
+    art += `<g class="herbs">${oregano}</g>`;
+
+    // Filet d'huile d'olive
+    for (let k = 0; k < 3; k++) {
+      const [x, y] = polar(R(30, 120), R(0, TAU));
+      art += `<path class="oil" d="M${f(x - 80)} ${f(y)}c30 -30 50 30 80 0s50 30 80 0" fill="none" stroke="#ffd25a" stroke-opacity=".35" stroke-width="3" stroke-linecap="round" transform="rotate(${f(R(0, 180))} ${f(x)} ${f(y)})"/>`;
+    }
+    for (let k = 0; k < 16; k++) {
+      const [x, y] = polar(R(20, 215), R(0, TAU));
+      art += `<ellipse class="glint" cx="${f(x)}" cy="${f(y)}" rx="${f(R(2.5, 6))}" ry="${f(R(1.2, 2.4))}" transform="rotate(${f(R(0, 180))} ${f(x)} ${f(y)})" fill="#fff" opacity=".35"/>`;
     }
 
     // Découpe en 8 parts
     for (let k = 0; k < 8; k++) {
-      const [x, y] = polar(256, ((112.5 + k * 45) * Math.PI) / 180);
-      art += `<line x1="0" y1="0" x2="${f(x)}" y2="${f(y)}" stroke="#4d1408" stroke-opacity=".35" stroke-width="2.5" stroke-linecap="round"/>`;
+      const [x, y] = polar(236, ((22.5 + k * 45) * Math.PI) / 180);
+      art += `<line x1="0" y1="0" x2="${f(x)}" y2="${f(y)}" stroke="#3d0f06" stroke-opacity=".3" stroke-width="2.4" stroke-linecap="round"/>`;
     }
-
-    const rad = (d) => (d * Math.PI) / 180;
-    const wedge = (r, from = 112.5, to = 157.5) => {
-      const a0 = rad(from);
-      const a1 = rad(to);
-      return `M0 0L${f(Math.cos(a0) * r)} ${f(Math.sin(a0) * r)}A${r} ${r} 0 0 1 ${f(Math.cos(a1) * r)} ${f(
-        Math.sin(a1) * r
-      )}Z`;
-    };
 
     svg.innerHTML = `
       <defs>
-        <radialGradient id="pz-crust" cx="0" cy="0" r="292" gradientUnits="userSpaceOnUse">
-          <stop offset=".78" stop-color="#ecb66d"/><stop offset=".87" stop-color="#d9924a"/>
-          <stop offset=".95" stop-color="#b4682b"/><stop offset="1" stop-color="#7d3f17"/>
+        <radialGradient id="pz-board" cx="0" cy="0" r="306" gradientUnits="userSpaceOnUse">
+          <stop offset=".85" stop-color="#9a6537"/><stop offset=".95" stop-color="#7a4b25"/><stop offset="1" stop-color="#4f2f15"/>
         </radialGradient>
-        <radialGradient id="pz-sauce" cx="0" cy="0" r="250" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#dc3d22"/><stop offset=".7" stop-color="#c52c18"/><stop offset="1" stop-color="#981c0f"/>
+        <radialGradient id="pz-crust" cx="0" cy="0" r="270" gradientUnits="userSpaceOnUse">
+          <stop offset=".8" stop-color="#eebc72"/><stop offset=".88" stop-color="#dd9a50"/>
+          <stop offset=".96" stop-color="#b86c2c"/><stop offset="1" stop-color="#7d3f17"/>
         </radialGradient>
-        <radialGradient id="pz-cheese" cx=".4" cy=".36" r=".72">
-          <stop offset="0" stop-color="#fffbf1"/><stop offset=".55" stop-color="#fbe8b8"/><stop offset="1" stop-color="#eec377"/>
+        <radialGradient id="pz-sauce" cx="-.1" cy="-.1" r="1.05">
+          <stop offset="0" stop-color="#e2492a"/><stop offset=".65" stop-color="#c72f19"/><stop offset="1" stop-color="#9a1d0f"/>
+        </radialGradient>
+        <radialGradient id="pz-cheese" cx=".4" cy=".35" r=".75">
+          <stop offset="0" stop-color="#fffdf5"/><stop offset=".5" stop-color="#fdedc4"/><stop offset="1" stop-color="#efc57a"/>
         </radialGradient>
         <radialGradient id="pz-char">
-          <stop offset="0" stop-color="#1c0b04" stop-opacity=".9"/><stop offset=".55" stop-color="#3b1a09" stop-opacity=".55"/>
+          <stop offset="0" stop-color="#1c0b04" stop-opacity=".9"/><stop offset=".55" stop-color="#3b1a09" stop-opacity=".5"/>
           <stop offset="1" stop-color="#3b1a09" stop-opacity="0"/>
         </radialGradient>
         <radialGradient id="pz-toast">
-          <stop offset="0" stop-color="#c3843a" stop-opacity=".6"/><stop offset="1" stop-color="#c3843a" stop-opacity="0"/>
+          <stop offset="0" stop-color="#b8722c" stop-opacity=".75"/><stop offset=".6" stop-color="#d49a4c" stop-opacity=".35"/>
+          <stop offset="1" stop-color="#d49a4c" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="pz-tomato" cx=".35" cy=".3" r=".8">
+          <stop offset="0" stop-color="#ff5a3a"/><stop offset=".7" stop-color="#d9261a"/><stop offset="1" stop-color="#9c120b"/>
         </radialGradient>
         <linearGradient id="pz-basil" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#5aa857"/><stop offset="1" stop-color="#1e5a25"/>
+          <stop offset="0" stop-color="#67b85e"/><stop offset=".55" stop-color="#3a8a3c"/><stop offset="1" stop-color="#1c5422"/>
         </linearGradient>
         <radialGradient id="pz-olive" cx=".35" cy=".35" r=".75">
-          <stop offset="0" stop-color="#4d453f"/><stop offset="1" stop-color="#141110"/>
+          <stop offset="0" stop-color="#55493f"/><stop offset="1" stop-color="#120f0d"/>
         </radialGradient>
-        <g id="pz-art">${art}</g>
-        <clipPath id="pz-rest"><path clip-rule="evenodd" d="M-340 -340H340V340H-340Z${wedge(330, 113.2, 156.8)}"/></clipPath>
-        <clipPath id="pz-cut"><path d="${wedge(330)}"/></clipPath>
       </defs>
-      <use href="#pz-art" clip-path="url(#pz-rest)"/>
-      <g class="pz-slice">
-        <path class="pz-slice-shadow" d="${wedge(289)}" fill="#000" opacity="0" transform="translate(5 12)"/>
-        <use href="#pz-art" clip-path="url(#pz-cut)"/>
-      </g>`;
+      ${art}`;
   }
 
   // =========================
@@ -482,6 +544,37 @@
     );
     update();
   }
+
+  // Grands titres découpés en lettres (elles montent une à une quand le titre apparaît)
+  function splitTitle(h) {
+    let i = 0;
+    const walk = (node) => {
+      [...node.childNodes].forEach((n) => {
+        if (n.nodeType === 1) return walk(n);
+        if (n.nodeType !== 3 || !n.textContent.trim()) return;
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/( +)/).forEach((word) => {
+          if (!word) return;
+          if (!word.trim()) return frag.appendChild(document.createTextNode(" "));
+          const w = document.createElement("span");
+          w.className = "w";
+          for (const c of word) {
+            const ch = document.createElement("span");
+            ch.className = "ch";
+            ch.style.setProperty("--i", i++);
+            ch.textContent = c;
+            w.appendChild(ch);
+          }
+          frag.appendChild(w);
+        });
+        n.replaceWith(frag);
+      });
+    };
+    h.setAttribute("aria-label", h.textContent.replace(/\s+/g, " ").trim());
+    walk(h);
+    h.classList.add("split");
+  }
+  document.querySelectorAll("h2").forEach(splitTitle);
 
   // Le bandeau est doublé pour défiler sans trou, même sur grand écran
   const band = $(".band-track");
