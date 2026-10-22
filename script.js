@@ -29,12 +29,53 @@
   // LA TOURNÉE
   // =========================
 
+  // spot : où se gare le camion · map : recherche envoyée à Google Maps
   const schedule = [
-    { day: 3, name: "Mercredi", town: "Béthisy-Saint-Martin", open: 17, close: 21, map: "Béthisy-Saint-Martin, Oise" },
-    { day: 4, name: "Jeudi", town: "Moru", open: 18, close: 21, map: "Moru, Pontpoint, Oise" },
-    { day: 5, name: "Vendredi", town: "Cinqueux", open: 17, close: 21, map: "Cinqueux, Oise" },
-    { day: 6, name: "Samedi", town: "Saint-Sauveur", open: 17, close: 21, map: "Saint-Sauveur, Oise" },
-    { day: 0, name: "Dimanche", town: "Pont-Sainte-Maxence", open: 18, close: 22, map: "Pont-Sainte-Maxence, Oise" },
+    {
+      day: 3,
+      name: "Mercredi",
+      town: "Béthisy-Saint-Martin",
+      open: 17,
+      close: 21,
+      spot: "Rue de Crépy, en face de L'Atelier de Coiffure",
+      map: "89 Rue de Crépy, 60320 Béthisy-Saint-Martin",
+    },
+    {
+      day: 4,
+      name: "Jeudi",
+      town: "Moru",
+      open: 18,
+      close: 21,
+      spot: "Hameau de Moru, Pontpoint",
+      map: "Moru, 60700 Pontpoint",
+    },
+    {
+      day: 5,
+      name: "Vendredi",
+      town: "Cinqueux",
+      open: 17,
+      close: 21,
+      spot: "Place de la Mairie",
+      map: "Mairie de Cinqueux, 10 Place Georges Tainturier, 60940 Cinqueux",
+    },
+    {
+      day: 6,
+      name: "Samedi",
+      town: "Saint-Sauveur",
+      open: 17,
+      close: 21,
+      spot: "Place de l'Église",
+      map: "Place de l'Église, 60320 Saint-Sauveur",
+    },
+    {
+      day: 0,
+      name: "Dimanche",
+      town: "Pont-Sainte-Maxence",
+      open: 18,
+      close: 22,
+      spot: "Parking devant la laverie du pont, rue de la République",
+      map: "1 Rue de la République, 60700 Pont-Sainte-Maxence",
+    },
   ];
 
   const hoursOf = (s) => `${s.open}h – ${s.close}h`;
@@ -52,7 +93,7 @@
           stop: today,
           kicker: "En ce moment",
           place: today.town,
-          detail: `Ouvert jusqu'à ${today.close}h`,
+          detail: `Jusqu'à ${today.close}h`,
           badge: "En ce moment",
           short: `Ouvert maintenant à ${today.town}, jusqu'à ${today.close}h`,
         };
@@ -94,6 +135,10 @@
     $("#today-kicker").textContent = status.kicker;
     $("#today-location").textContent = status.place;
     $("#today-hours").textContent = status.detail;
+    $("#today-spot").textContent = status.stop.spot;
+    const map = $("#today-map");
+    map.href = mapUrl(status.stop);
+    map.setAttribute("aria-label", `Itinéraire vers ${status.stop.town}, ${status.stop.spot}`);
     const short = $("[data-status-short]");
     if (short) short.textContent = status.short;
   }
@@ -109,7 +154,8 @@
           <p class="stop-day">${s.name}</p>
           <h3 class="stop-town">${s.town}</h3>
           <p class="stop-hours">${hoursOf(s)}</p>
-          <a class="stop-map" href="${mapUrl(s)}" target="_blank" rel="noopener" data-cursor="Y aller">
+          <p class="stop-spot"><svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>${s.spot}</p>
+          <a class="stop-map" href="${mapUrl(s)}" target="_blank" rel="noopener">
             Itinéraire <svg class="icon"><use href="#i-arrow" /></svg>
           </a>
         </li>`;
@@ -773,46 +819,8 @@
   });
 
   // =========================
-  // CURSEUR & EFFET MAGNÉTIQUE
+  // EFFET MAGNÉTIQUE
   // =========================
-
-  function initCursor() {
-    root.classList.add("has-cursor");
-    const ring = $(".cursor");
-    const dot = $(".cursor-dot");
-    const label = $(".cursor-label");
-    ring.classList.add("is-out");
-    dot.classList.add("is-out");
-
-    const rx = gsap.quickTo(ring, "x", { duration: 0.55, ease: "power3" });
-    const ry = gsap.quickTo(ring, "y", { duration: 0.55, ease: "power3" });
-
-    window.addEventListener(
-      "pointermove",
-      (e) => {
-        rx(e.clientX);
-        ry(e.clientY);
-        gsap.set(dot, { x: e.clientX, y: e.clientY });
-        ring.classList.remove("is-out");
-        dot.classList.remove("is-out");
-        ring.classList.toggle("on-light", !!e.target.closest("[data-light]"));
-      },
-      { passive: true }
-    );
-
-    document.addEventListener("pointerover", (e) => {
-      const t = e.target.closest("a, button, [data-cursor], .dish");
-      const lab = t && t.dataset.cursor;
-      ring.classList.toggle("has-label", !!lab);
-      ring.classList.toggle("is-hover", !!t && !lab);
-      if (lab) label.textContent = lab;
-    });
-
-    document.documentElement.addEventListener("pointerleave", () => {
-      ring.classList.add("is-out");
-      dot.classList.add("is-out");
-    });
-  }
 
   function initMagnetic() {
     $$(".magnetic").forEach((el) => {
@@ -875,66 +883,28 @@
       .from(".pizza-wrap", { scale: 0.45, rotate: -150, opacity: 0, duration: 2.4 }, 0)
       .from(".hero-title .char", { yPercent: 118, rotate: 7, duration: 1.5, stagger: 0.05 }, 0.15)
       .from(".hero-eyebrow", { y: 20, opacity: 0, duration: 1.1 }, 0.35)
-      .from([".hero-text", ".hero-actions > *", ".today"], { y: 34, opacity: 0, duration: 1.3, stagger: 0.09 }, 0.55)
+      .from([".hero-text", ".today", ".hero-actions > *"], { y: 34, opacity: 0, duration: 1.3, stagger: 0.09 }, 0.5)
       .from(".badge", { scale: 0, rotate: -200, duration: 1.6 }, 0.8)
       .from(".scroll-hint", { opacity: 0, y: -10, duration: 1 }, 1.2);
     return tl;
   }
 
-  function runLoader(intro) {
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem("cp-seen") === "1";
-      sessionStorage.setItem("cp-seen", "1");
-    } catch (e) {
-      /* stockage indisponible */
-    }
+  // Entrée directe, sans écran de chargement : on attend juste les polices (1,2 s max)
+  function startIntro(intro) {
+    const fontsReady = document.fonts ? Promise.race([document.fonts.ready, wait(1200)]) : Promise.resolve();
+    fontsReady.then(() => {
+      root.classList.remove("intro");
+      ScrollTrigger.refresh();
+      intro.play();
+      if (lenis) lenis.start();
 
-    const fontsReady = document.fonts ? Promise.race([document.fonts.ready, wait(2500)]) : Promise.resolve();
-    const num = $(".loader-num");
-    const bar = $(".loader-bar span");
-    const counter = { v: 0 };
-
-    const tl = gsap.timeline();
-    tl.from(".loader-logo", { scale: 0.7, opacity: 0, duration: 0.9, ease: "expo.out" }, 0)
-      .from(".loader-label", { y: 14, opacity: 0, duration: 0.8, ease: "expo.out" }, 0.15)
-      .to(
-        counter,
-        {
-          v: 100,
-          duration: seen ? 0.6 : 1.7,
-          ease: "power2.inOut",
-          onUpdate: () => {
-            num.textContent = Math.round(counter.v);
-            bar.style.transform = `scaleX(${counter.v / 100})`;
-          },
-        },
-        0
-      )
-      .add(() => {
-        tl.pause();
-        fontsReady.then(() => tl.resume());
-      })
-      .to([".loader-inner", ".loader-count", ".loader-bar"], {
-        y: -40,
-        opacity: 0,
-        duration: 0.5,
-        ease: "power2.in",
-        stagger: 0.04,
-      })
-      .to(".loader", { y: () => -window.innerHeight * 1.25, duration: 1.1, ease: "expo.inOut" }, "-=0.2")
-      .add(() => intro.play(), "-=0.65")
-      .add(() => {
-        root.classList.add("loaded");
-        if (lenis) lenis.start();
-        ScrollTrigger.refresh();
-        // Lien direct vers une section (ex. camionpizza.net/#carte)
-        const target = location.hash.length > 1 && document.getElementById(location.hash.slice(1));
-        if (target && target !== hero) {
-          if (lenis) lenis.scrollTo(target, { duration: 1.6 });
-          else target.scrollIntoView({ behavior: "smooth" });
-        }
-      });
+      // Lien direct vers une section (ex. camionpizza.net/#carte)
+      const target = location.hash.length > 1 && document.getElementById(location.hash.slice(1));
+      if (target && target !== hero) {
+        if (lenis) lenis.scrollTo(target, { duration: 1.6 });
+        else target.scrollIntoView({ behavior: "smooth" });
+      }
+    });
   }
 
   function initScrollScenes(road) {
@@ -1146,7 +1116,7 @@
   if (!motion) {
     // Version sans animation : tout est visible, le camion est garé à la dernière étape
     road.set(road.endL);
-    root.classList.add("loaded");
+    root.classList.remove("intro");
     window.addEventListener("scroll", () => onScroll(window.scrollY), { passive: true });
     onScroll(window.scrollY);
     return;
@@ -1181,16 +1151,12 @@
     );
   }
 
-  new Embers($('[data-embers="hero"]'), { interactive: finePointer });
-  new Embers($('[data-embers="cta"]'), { density: 0.8 });
+  new Embers($('[data-embers="hero"]'), { interactive: finePointer, density: 0.55 });
 
   initMarquees();
-  if (finePointer) {
-    initCursor();
-    initMagnetic();
-  }
+  if (finePointer) initMagnetic();
 
   const intro = heroIntro();
   initScrollScenes(road);
-  runLoader(intro);
+  startIntro(intro);
 })();

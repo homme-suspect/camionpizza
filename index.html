@@ -42,9 +42,13 @@
       (function () {
         var d = document.documentElement;
         d.classList.add("js");
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("reduced");
-        // Filet de sécurité : jamais bloqué derrière l'écran de chargement
-        setTimeout(function () { d.classList.add("loaded"); }, 6000);
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          d.classList.add("reduced");
+        } else {
+          // Masque l'accueil le temps de lancer l'animation d'entrée (jamais plus de 3 s)
+          d.classList.add("intro");
+          setTimeout(function () { d.classList.remove("intro"); }, 3000);
+        }
       })();
     </script>
 
@@ -91,6 +95,10 @@
       <symbol id="i-down" viewBox="0 0 24 24">
         <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m-6-6 6 6 6-6" />
       </symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z" />
+        <circle cx="12" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="2" />
+      </symbol>
       <symbol id="i-leaf" viewBox="0 0 24 24">
         <path
           fill="none"
@@ -102,22 +110,6 @@
         />
       </symbol>
     </svg>
-
-    <!-- =========================
-         ÉCRAN DE CHARGEMENT
-    ========================== -->
-    <div class="loader" aria-hidden="true">
-      <div class="loader-inner">
-        <img src="image/logo.png" alt="" class="loader-logo" width="160" height="152" />
-        <p class="loader-label">Le four chauffe…</p>
-      </div>
-      <div class="loader-bar"><span></span></div>
-      <p class="loader-count"><span class="loader-num">0</span><small>%</small></p>
-    </div>
-
-    <!-- Curseur (desktop) -->
-    <div class="cursor" aria-hidden="true"><span class="cursor-label"></span></div>
-    <div class="cursor-dot" aria-hidden="true"></div>
 
     <div class="progress" aria-hidden="true"></div>
 
@@ -135,7 +127,7 @@
         <a href="#contact" class="roll"><span data-text="Contact">Contact</span></a>
       </nav>
 
-      <a href="tel:+33786966498" class="header-cta magnetic" data-cursor="Appeler">
+      <a href="tel:+33786966498" class="header-cta magnetic">
         <svg class="icon"><use href="#i-phone" /></svg>
         <span>Commander</span>
       </a>
@@ -207,25 +199,32 @@
             <em>Un coup de fil</em>, et votre pizza file au four.
           </p>
 
+          <!-- Emplacement du jour -->
+          <div class="today" id="today" aria-live="polite">
+            <div class="today-top">
+              <span class="today-badge"><span class="today-pulse" aria-hidden="true"></span><span id="today-kicker">Ce soir</span></span>
+              <span class="today-hours" id="today-hours"></span>
+            </div>
+            <p class="today-place" id="today-location">La tournée</p>
+            <p class="today-spot">
+              <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>
+              <span id="today-spot">Du mercredi au dimanche</span>
+            </p>
+            <a class="today-map" id="today-map" href="#tournee" target="_blank" rel="noopener">
+              Itinéraire <svg class="icon" aria-hidden="true"><use href="#i-arrow" /></svg>
+            </a>
+          </div>
+
           <div class="hero-actions">
-            <a href="tel:+33786966498" class="btn btn-fire magnetic" data-cursor="Appeler">
+            <a href="tel:+33786966498" class="btn btn-fire magnetic">
               <span class="btn-inner">
                 <svg class="icon"><use href="#i-phone" /></svg>
                 Commander <span class="btn-sub">07 86 96 64 98</span>
               </span>
             </a>
-            <a href="#carte" class="btn btn-ghost magnetic" data-cursor="Voir">
+            <a href="#carte" class="btn btn-ghost magnetic">
               <span class="btn-inner">Voir la carte <svg class="icon"><use href="#i-down" /></svg></span>
             </a>
-          </div>
-
-          <div class="today" aria-live="polite">
-            <span class="today-pulse" aria-hidden="true"></span>
-            <div>
-              <p class="today-kicker" id="today-kicker">Ce soir</p>
-              <p class="today-place" id="today-location">Chargement…</p>
-              <p class="today-hours" id="today-hours"></p>
-            </div>
           </div>
         </div>
 
@@ -241,12 +240,7 @@
       <div class="marquees" aria-hidden="true">
         <div class="marquee marquee-red" data-marquee="1">
           <div class="marquee-track">
-            <span>Feu de bois</span><b>✦</b><span>Pizzas artisanales</span><b>✦</b><span>À emporter</span><b>✦</b><span>Commande par téléphone</span><b>✦</b>
-          </div>
-        </div>
-        <div class="marquee marquee-cream" data-marquee="-1">
-          <div class="marquee-track">
-            <span>Mercredi → Dimanche</span><b>●</b><span>5 villes</span><b>●</b><span>31 recettes</span><b>●</b><span>Dès 8,50 €</span><b>●</b>
+            <span>Feu de bois</span><b>✦</b><span>Pizzas artisanales</span><b>✦</b><span>Mercredi → Dimanche</span><b>✦</b><span>Commande par téléphone</span><b>✦</b>
           </div>
         </div>
       </div>
@@ -305,7 +299,7 @@
               href="documents/carte-pizzas.pdf"
               download="Carte-Camion-Pizza.pdf"
               class="download magnetic"
-              data-cursor="PDF"
+             
             >
               <span>Télécharger la carte</span>
               <svg class="icon"><use href="#i-down" /></svg>
@@ -405,7 +399,6 @@
            CONTACT
       ========================== -->
       <section id="contact" class="cta">
-        <canvas class="embers" data-embers="cta" aria-hidden="true"></canvas>
         <div class="cta-fire" aria-hidden="true"></div>
 
         <p class="section-label"><span>(04)</span> Commander</p>
@@ -415,7 +408,7 @@
         </h2>
         <p class="cta-text">Appelez-nous, on vous la prépare au feu de bois.</p>
 
-        <a href="tel:+33786966498" class="call magnetic" data-cursor="Appeler" aria-label="Appeler le 07 86 96 64 98">
+        <a href="tel:+33786966498" class="call magnetic" aria-label="Appeler le 07 86 96 64 98">
           <svg class="call-ring" viewBox="0 0 200 200" aria-hidden="true">
             <defs>
               <path id="call-circle" d="M100 100m-82 0a82 82 0 1 1 164 0a82 82 0 1 1-164 0" />
