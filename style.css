@@ -1,19 +1,26 @@
 /* =========================
-   CAMION PIZZA — version simple et lisible
+   CAMION PIZZA — lisible pour tous, avec du caractère
 ========================= */
 
 :root {
-  --bg: #fbf6ee;
+  --dark: #120d0a;
+  --dark-2: #1d1612;
+  --cream: #fbf6ee;
   --white: #ffffff;
   --ink: #1a120d;
   --muted: #5c4f46;
   --line: #e4d9cb;
+  --light-text: #f6efe4;
+  --light-muted: #cfc3b6;
   --red: #c4161c;
   --red-dark: #9e1015;
-  --green: #1d7a3e;
+  --flame: #ff6a1a;
+  --amber: #ffb02e;
+  --green: #3ddc84;
   --c-tomate: #c4161c;
   --c-creme: #1474a8;
   --c-pecheurs: #0b4f80;
+  --fire: linear-gradient(180deg, #ffc84a 0%, #ff7a1a 50%, #e31e24 100%);
   --display: "Anton", Impact, "Arial Narrow", sans-serif;
   --body: "Manrope", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
 }
@@ -30,7 +37,7 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background: var(--cream);
   color: var(--ink);
   font-family: var(--body);
   font-size: 19px;
@@ -42,12 +49,13 @@ a {
   color: inherit;
 }
 
-img {
+img,
+svg {
   display: block;
 }
 
 :focus-visible {
-  outline: 3px solid var(--red);
+  outline: 3px solid var(--amber);
   outline-offset: 3px;
 }
 
@@ -58,6 +66,20 @@ img {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+/* Apparition douce au scroll */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.js .reveal.is-in {
+  opacity: 1;
+  transform: none;
 }
 
 /* =========================
@@ -74,8 +96,11 @@ img {
   gap: 20px;
 
   padding: 10px 20px;
-  background: var(--ink);
-  color: var(--white);
+  background: rgba(18, 13, 10, 0.92);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(246, 239, 228, 0.1);
+  color: var(--light-text);
 }
 
 .brand img {
@@ -95,7 +120,7 @@ img {
 }
 
 .nav a:hover {
-  text-decoration: underline;
+  color: var(--amber);
 }
 
 .header-call {
@@ -106,49 +131,105 @@ img {
   font-weight: 800;
   text-decoration: none;
   white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.header-call:hover {
+  background: var(--red-dark);
 }
 
 /* =========================
-   AUJOURD'HUI
+   ACCUEIL : EMPLACEMENT DU JOUR + PIZZA
 ========================= */
 
+.hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  gap: 20px;
+
+  min-height: calc(100vh - 84px);
+  padding: 40px max(20px, 5vw);
+
+  background: var(--dark);
+  color: var(--light-text);
+}
+
+.hero-glow {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -50%;
+  z-index: -1;
+  height: 90%;
+  background: radial-gradient(50% 50% at 50% 100%, rgba(255, 106, 26, 0.35), rgba(227, 30, 36, 0.12) 45%, transparent 72%);
+}
+
 .today {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 48px 20px 40px;
-  text-align: center;
+  max-width: 640px;
+}
+
+.hero-brand {
+  color: var(--amber);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
 .today-label {
-  display: inline-block;
-  padding: 8px 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 9px 18px;
 
-  background: #fde9c8;
+  background: rgba(255, 176, 46, 0.15);
   border-radius: 999px;
-  color: #8a4b00;
+  color: var(--amber);
 
   font-size: 18px;
   font-weight: 800;
 }
 
+.today-label::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
 .today.is-open .today-label {
-  background: #d8f2e1;
+  background: rgba(61, 220, 132, 0.15);
   color: var(--green);
 }
 
-.today-town {
-  margin: 16px 0 6px;
+.today.is-open .today-label::before {
+  animation: pulse 1.6s ease-in-out infinite;
+}
 
-  color: var(--red);
+.today-town {
+  margin: 18px 0 8px;
+
+  background: var(--fire);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
   font-family: var(--display);
-  font-size: clamp(56px, 14vw, 96px);
+  font-size: clamp(56px, 8vw, 116px);
   line-height: 1.05;
   text-transform: uppercase;
   overflow-wrap: break-word;
 }
 
 .today-hours {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 800;
 }
 
@@ -165,7 +246,7 @@ img {
   align-items: center;
   justify-content: center;
 
-  min-height: 72px;
+  min-height: 74px;
   padding: 14px 20px;
 
   border-radius: 16px;
@@ -175,6 +256,15 @@ img {
   line-height: 1.25;
   text-align: center;
   text-decoration: none;
+
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    transform 0.2s;
+}
+
+.button:hover {
+  transform: translateY(-2px);
 }
 
 .button span {
@@ -185,6 +275,7 @@ img {
 .button-red {
   background: var(--red);
   color: var(--white);
+  box-shadow: 0 14px 34px -12px rgba(227, 30, 36, 0.8);
 }
 
 .button-red:hover {
@@ -192,30 +283,60 @@ img {
 }
 
 .button-white {
-  background: var(--white);
-  border: 2px solid var(--ink);
+  background: var(--light-text);
   color: var(--ink);
 }
 
-.button-white:hover,
+.button-white:hover {
+  background: var(--amber);
+}
+
+.button-outline {
+  max-width: 420px;
+  margin: 40px auto 0;
+  border: 2px solid var(--ink);
+  font-size: 19px;
+}
+
 .button-outline:hover {
   background: var(--ink);
   color: var(--white);
 }
 
-.button-outline {
-  max-width: 420px;
-  margin: 36px auto 0;
-  border: 2px solid var(--ink);
-  font-size: 19px;
-}
-
 .today-menu {
   display: inline-block;
-  margin-top: 28px;
-  color: var(--ink);
+  margin-top: 26px;
   font-size: 20px;
   font-weight: 800;
+}
+
+.today-menu:hover {
+  color: var(--amber);
+}
+
+/* La grande pizza qui tourne */
+.hero-pizza {
+  position: relative;
+  width: min(100%, 620px);
+  justify-self: center;
+}
+
+.hero-pizza::before {
+  content: "";
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  box-shadow:
+    0 40px 80px -20px rgba(0, 0, 0, 0.8),
+    0 0 110px 10px rgba(255, 106, 26, 0.18);
+}
+
+.pizza {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  animation: spin 50s linear infinite;
 }
 
 /* =========================
@@ -223,7 +344,7 @@ img {
 ========================= */
 
 .section {
-  padding: 56px 20px;
+  padding: 64px 20px;
 }
 
 .section > * {
@@ -232,15 +353,14 @@ img {
   margin-right: auto;
 }
 
-.section-alt {
-  background: var(--white);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+.section-dark {
+  background: var(--dark);
+  color: var(--light-text);
 }
 
 h2 {
   font-family: var(--display);
-  font-size: clamp(40px, 8vw, 60px);
+  font-size: clamp(42px, 8vw, 64px);
   font-weight: 400;
   line-height: 1.1;
   text-align: center;
@@ -251,6 +371,10 @@ h2 {
   margin-top: 8px;
   color: var(--muted);
   text-align: center;
+}
+
+.section-dark .section-intro {
+  color: var(--light-muted);
 }
 
 /* Raccourcis vers les catégories */
@@ -268,6 +392,11 @@ h2 {
   color: var(--white);
   font-weight: 800;
   text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.jump a:hover {
+  transform: translateY(-2px);
 }
 
 .jump-tomate {
@@ -284,7 +413,7 @@ h2 {
 
 /* Liste des pizzas */
 .category {
-  margin-top: 44px;
+  margin-top: 48px;
 }
 
 .category h3 {
@@ -313,26 +442,37 @@ h2 {
 }
 
 .dish {
-  padding: 16px 4px;
+  padding: 16px 6px;
   border-bottom: 1px solid var(--line);
 }
 
 .dish-top {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
-  gap: 16px;
+  gap: 12px;
+}
+
+/* pointillés entre le nom et le prix, comme sur un menu */
+.dish-top::after {
+  content: "";
+  order: 1;
+  flex: 1;
+  min-width: 20px;
+  border-bottom: 2px dotted rgba(26, 18, 13, 0.25);
+  transform: translateY(-6px);
 }
 
 .dish-name {
-  font-size: 22px;
-  font-weight: 800;
+  font-family: var(--display);
+  font-size: 25px;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
 .dish-price {
-  font-size: 22px;
-  font-weight: 800;
+  order: 2;
+  font-family: var(--display);
+  font-size: 25px;
   white-space: nowrap;
 }
 
@@ -361,7 +501,7 @@ h2 {
 .week {
   display: grid;
   gap: 14px;
-  margin-top: 30px;
+  margin-top: 32px;
   list-style: none;
 }
 
@@ -369,24 +509,24 @@ h2 {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 6px 16px;
+  gap: 4px 16px;
 
-  padding: 18px 20px;
+  padding: 20px 22px;
 
-  background: var(--bg);
-  border: 2px solid var(--line);
-  border-radius: 16px;
+  background: var(--dark-2);
+  border: 2px solid rgba(246, 239, 228, 0.1);
+  border-radius: 18px;
 }
 
 .day.is-today {
-  background: #fff3e6;
-  border-color: var(--red);
+  background: linear-gradient(135deg, rgba(227, 30, 36, 0.25), rgba(255, 106, 26, 0.08));
+  border-color: var(--flame);
 }
 
 .day-name {
+  color: var(--amber);
   font-size: 18px;
   font-weight: 800;
-  color: var(--muted);
   text-transform: uppercase;
 }
 
@@ -400,12 +540,14 @@ h2 {
 }
 
 .day-town {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1.2;
+  font-family: var(--display);
+  font-size: 30px;
+  line-height: 1.15;
+  text-transform: uppercase;
 }
 
 .day-hours {
+  color: var(--light-muted);
   font-size: 19px;
   font-weight: 700;
 }
@@ -415,12 +557,17 @@ h2 {
   grid-row: 1 / span 3;
 
   padding: 14px 18px;
-  background: var(--ink);
+  background: var(--light-text);
   border-radius: 12px;
-  color: var(--white);
+  color: var(--ink);
   font-weight: 800;
   text-decoration: none;
   white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.day-map:hover {
+  background: var(--amber);
 }
 
 /* =========================
@@ -428,29 +575,58 @@ h2 {
 ========================= */
 
 .order {
-  padding: 56px 20px;
-  background: var(--red);
-  color: var(--white);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  padding: 72px 20px;
+  background: #0a0706;
+  color: var(--light-text);
   text-align: center;
 }
 
+.order-glow {
+  position: absolute;
+  left: -25%;
+  right: -25%;
+  bottom: -10%;
+  z-index: -1;
+  height: 80%;
+  background: radial-gradient(48% 70% at 50% 100%, rgba(255, 122, 26, 0.45), rgba(227, 30, 36, 0.2) 45%, transparent 75%);
+}
+
+.order h2 span {
+  display: block;
+  background: var(--fire);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .order p {
-  margin-top: 8px;
+  margin-top: 10px;
+  color: var(--light-muted);
   font-size: 21px;
 }
 
 .order-phone {
   display: inline-block;
-  margin-top: 18px;
-  padding: 18px 30px;
+  margin-top: 24px;
+  padding: 18px 32px;
 
-  background: var(--white);
-  border-radius: 16px;
-  color: var(--red);
+  background: var(--red);
+  border-radius: 18px;
+  color: var(--white);
+  box-shadow: 0 18px 44px -14px rgba(227, 30, 36, 0.9);
 
   font-family: var(--display);
-  font-size: clamp(36px, 9vw, 56px);
+  font-size: clamp(32px, 8vw, 52px);
   text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.order-phone:hover {
+  background: var(--red-dark);
 }
 
 /* =========================
@@ -464,8 +640,8 @@ h2 {
   gap: 14px;
 
   padding: 36px 20px 40px;
-  background: var(--ink);
-  color: #cfc4b8;
+  background: var(--dark);
+  color: var(--light-muted);
   font-size: 15px;
   text-align: center;
 }
@@ -474,9 +650,39 @@ h2 {
   display: none;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.4);
+  }
+}
+
 /* =========================
-   TÉLÉPHONE
+   TABLETTE ET TÉLÉPHONE
 ========================= */
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    padding: 32px 20px 0;
+    text-align: center;
+  }
+
+  .today {
+    margin: 0 auto;
+  }
+
+  .hero-pizza {
+    width: min(110%, 520px);
+    margin-bottom: -35%;
+  }
+}
 
 @media (max-width: 700px) {
   body {
@@ -495,12 +701,13 @@ h2 {
     width: 54px;
   }
 
-  .today {
-    padding-top: 32px;
-  }
-
   .today-buttons {
     grid-template-columns: 1fr;
+  }
+
+  .dish-name,
+  .dish-price {
+    font-size: 22px;
   }
 
   .day {
@@ -510,12 +717,8 @@ h2 {
   .day-map {
     grid-column: auto;
     grid-row: auto;
-    margin-top: 8px;
+    margin-top: 10px;
     text-align: center;
-  }
-
-  .footer {
-    padding-bottom: 30px;
   }
 
   .call-bar {
@@ -535,6 +738,19 @@ h2 {
     font-weight: 800;
     text-align: center;
     text-decoration: none;
-    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pizza,
+  .today-label::before {
+    animation: none !important;
+  }
+
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

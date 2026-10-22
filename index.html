@@ -30,6 +30,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@500;600;700;800&display=swap" />
     <link rel="stylesheet" href="style.css" />
+    <script>document.documentElement.classList.add("js");</script>
 
     <script type="application/ld+json">
       {
@@ -74,31 +75,40 @@
       <!-- =========================
            AUJOURD'HUI
       ========================== -->
-      <section class="today" id="aujourdhui" aria-live="polite">
-        <h1 class="sr-only">Camion Pizza — La Maison de la Pizza, pizzas au feu de bois</h1>
+      <section class="hero" id="aujourdhui">
+        <div class="hero-glow" aria-hidden="true"></div>
 
-        <p class="today-label" id="today-kicker">Où est le camion ?</p>
-        <p class="today-town" id="today-location">Du mercredi au dimanche</p>
-        <p class="today-hours" id="today-hours"></p>
+        <div class="today" aria-live="polite">
+          <h1 class="sr-only">Camion Pizza — La Maison de la Pizza, pizzas au feu de bois</h1>
+          <p class="hero-brand">Camion pizza · Feu de bois</p>
 
-        <div class="today-buttons">
-          <a href="tel:+33786966498" class="button button-red">
-            📞 Commander<br /><span>07 86 96 64 98</span>
-          </a>
-          <a href="#tournee" class="button button-white" id="today-map" target="_blank" rel="noopener">
-            📍 Itinéraire
-          </a>
+          <p class="today-label" id="today-kicker">Où est le camion ?</p>
+          <p class="today-town" id="today-location">Du mercredi au dimanche</p>
+          <p class="today-hours" id="today-hours"></p>
+
+          <div class="today-buttons">
+            <a href="tel:+33786966498" class="button button-red">
+              📞 Commander<br /><span>07 86 96 64 98</span>
+            </a>
+            <a href="#tournee" class="button button-white" id="today-map" target="_blank" rel="noopener">
+              📍 Itinéraire
+            </a>
+          </div>
+
+          <a href="#carte" class="today-menu">Voir la carte des pizzas ↓</a>
         </div>
 
-        <a href="#carte" class="today-menu">Voir la carte des pizzas ↓</a>
+        <div class="hero-pizza" aria-hidden="true">
+          <svg class="pizza" id="pizza" viewBox="-310 -310 620 620"></svg>
+        </div>
       </section>
 
       <!-- =========================
            LA CARTE
       ========================== -->
       <section class="section" id="carte">
-        <h2>La carte</h2>
-        <p class="section-intro">Pizzas au feu de bois · Ingrédient supplémentaire <strong>+1 €</strong></p>
+        <h2 class="reveal">La carte</h2>
+        <p class="section-intro reveal">Pizzas au feu de bois · Ingrédient supplémentaire <strong>+1 €</strong></p>
 
         <div class="jump">
           <a href="#tomate" class="jump-tomate">Base tomate</a>
@@ -117,19 +127,20 @@
       <!-- =========================
            OÙ NOUS TROUVER
       ========================== -->
-      <section class="section section-alt" id="tournee">
-        <h2>Où nous trouver ?</h2>
-        <p class="section-intro">Fermé le lundi et le mardi.</p>
-        <ul class="week" id="week"></ul>
+      <section class="section section-dark" id="tournee">
+        <h2 class="reveal">Où nous trouver ?</h2>
+        <p class="section-intro reveal">Du mercredi au dimanche. Fermé le lundi et le mardi.</p>
+        <ul class="week reveal" id="week"></ul>
       </section>
 
       <!-- =========================
            COMMANDER
       ========================== -->
       <section class="order">
-        <h2>Une pizza ce soir ?</h2>
-        <p>Appelez-nous pour commander :</p>
-        <a href="tel:+33786966498" class="order-phone">07 86 96 64 98</a>
+        <div class="order-glow" aria-hidden="true"></div>
+        <h2 class="reveal">Une pizza <span>ce soir ?</span></h2>
+        <p class="reveal">Appelez-nous, on vous la prépare au feu de bois.</p>
+        <a href="tel:+33786966498" class="order-phone reveal">📞 07 86 96 64 98</a>
       </section>
     </main>
 
