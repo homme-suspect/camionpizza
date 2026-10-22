@@ -86,11 +86,47 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Accueil masqué le temps de lancer l'animation d'entrée */
-html.intro .site-header,
-html.intro .hero-content,
-html.intro .hero-visual {
+/* =========================
+   ÉCRAN DE CHARGEMENT
+========================= */
+
+.loader {
+  display: none;
+}
+
+html.js:not(.reduced) .loader {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+
+  display: grid;
+  place-items: center;
+
+  background: radial-gradient(circle at 50% 50%, rgba(255, 106, 26, 0.16), transparent 22%), var(--bg);
+  transition:
+    opacity 0.6s var(--ease),
+    visibility 0s 0.6s;
+}
+
+html.loaded .loader {
+  opacity: 0;
   visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-pizza {
+  width: 88px;
+  height: 88px;
+  animation:
+    loader-in 0.6s var(--ease-out) both,
+    spin 1.8s linear infinite;
+}
+
+@keyframes loader-in {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
 }
 
 ::selection {
@@ -536,7 +572,7 @@ button {
 .pizza-spin {
   width: 100%;
   height: 100%;
-  animation: spin 90s linear infinite;
+  animation: spin 40s linear infinite;
   will-change: transform;
 }
 
@@ -2191,7 +2227,7 @@ button {
     align-self: center;
 
     width: min(122vw, 640px);
-    margin: 36px 0 -40%;
+    margin: 12px 0 -40%;
     translate: none;
   }
 

@@ -888,13 +888,14 @@
     return tl;
   }
 
-  // Entrée directe, sans écran de chargement : on attend juste les polices (1,2 s max)
+  // La petite pizza tourne le temps que les polices arrivent (0,8 s mini, 2,5 s maxi),
+  // puis l'écran s'efface et l'accueil s'anime
   function startIntro(intro) {
-    const fontsReady = document.fonts ? Promise.race([document.fonts.ready, wait(1200)]) : Promise.resolve();
-    fontsReady.then(() => {
-      root.classList.remove("intro");
+    const fontsReady = document.fonts ? Promise.race([document.fonts.ready, wait(2500)]) : Promise.resolve();
+    Promise.all([fontsReady, wait(800)]).then(() => {
+      root.classList.add("loaded");
       ScrollTrigger.refresh();
-      intro.play();
+      gsap.delayedCall(0.25, () => intro.play());
       if (lenis) lenis.start();
 
       // Lien direct vers une section (ex. camionpizza.net/#carte)
@@ -1115,7 +1116,7 @@
   if (!motion) {
     // Version sans animation : tout est visible, le camion est garé à la dernière étape
     road.set(road.endL);
-    root.classList.remove("intro");
+    root.classList.add("loaded");
     window.addEventListener("scroll", () => onScroll(window.scrollY), { passive: true });
     onScroll(window.scrollY);
     return;

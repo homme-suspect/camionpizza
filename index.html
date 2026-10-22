@@ -42,13 +42,9 @@
       (function () {
         var d = document.documentElement;
         d.classList.add("js");
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-          d.classList.add("reduced");
-        } else {
-          // Masque l'accueil le temps de lancer l'animation d'entrée (jamais plus de 3 s)
-          d.classList.add("intro");
-          setTimeout(function () { d.classList.remove("intro"); }, 3000);
-        }
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("reduced");
+        // Filet de sécurité : l'écran de chargement ne reste jamais plus de 8 s
+        setTimeout(function () { d.classList.add("loaded"); }, 8000);
       })();
     </script>
 
@@ -106,6 +102,40 @@
         />
       </symbol>
     </svg>
+
+    <!-- Écran de chargement : une petite pizza qui tourne -->
+    <div class="loader" aria-hidden="true">
+      <svg class="loader-pizza" viewBox="-50 -50 100 100">
+        <circle r="48" fill="#d9924a" />
+        <circle r="46.5" fill="none" stroke="#a85d27" stroke-width="3" />
+        <circle r="39" fill="#c8301c" />
+        <path
+          d="M0 0V-39M0 0V39M0 0H39M0 0H-39M0 0L27.6 27.6M0 0L-27.6 27.6M0 0L27.6 -27.6M0 0L-27.6 -27.6"
+          stroke="#5a1a0c"
+          stroke-opacity=".35"
+          stroke-width="1.2"
+        />
+        <g fill="#fbe8b8">
+          <circle cx="-14" cy="-19" r="8" />
+          <circle cx="17" cy="-12" r="9" />
+          <circle cx="-3" cy="10" r="10" />
+          <circle cx="22" cy="17" r="7" />
+          <circle cx="-25" cy="11" r="6.5" />
+          <circle cx="5" cy="-30" r="5" />
+          <circle cx="2" cy="31" r="5.5" />
+        </g>
+        <g fill="#2e7d32">
+          <ellipse cx="6" cy="-4" rx="5.5" ry="2.8" transform="rotate(-30 6 -4)" />
+          <ellipse cx="-17" cy="-3" rx="5.5" ry="2.8" transform="rotate(40 -17 -3)" />
+          <ellipse cx="14" cy="28" rx="5" ry="2.5" transform="rotate(10 14 28)" />
+        </g>
+        <g fill="#1d1a17">
+          <circle cx="-8" cy="-31" r="2.8" />
+          <circle cx="29" cy="2" r="2.8" />
+          <circle cx="-20" cy="24" r="2.8" />
+        </g>
+      </svg>
+    </div>
 
     <div class="progress" aria-hidden="true"></div>
 
