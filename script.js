@@ -134,13 +134,41 @@
     box.classList.remove("is-open", "is-tonight", "is-next");
     box.classList.add(`is-${status.state}`);
     $("#today-kicker").textContent = status.kicker;
-    $("#today-location").textContent = status.place;
+    renderTown(status.place);
     $("#today-hours").textContent = status.detail;
     const map = $("#today-map");
     map.href = mapUrl(status.stop);
     map.setAttribute("aria-label", `Itinéraire vers ${status.stop.town}, ${status.stop.spot}`);
     const short = $("[data-status-short]");
     if (short) short.textContent = status.short;
+  }
+
+  // Nom de la ville en très grand, lettre par lettre (annoncé en entier aux lecteurs d'écran)
+  const townEl = $("#today-location");
+
+  function renderTown(town) {
+    if (townEl.dataset.town === town) return;
+    townEl.dataset.town = town;
+    townEl.innerHTML = `<span class="sr-only"></span><span aria-hidden="true"></span>`;
+    townEl.firstChild.textContent = town;
+    townEl.lastChild.textContent = town;
+    splitChars(townEl.lastChild);
+    fitTown();
+  }
+
+  // Réduit la taille jusqu'à tenir sur 2 lignes maximum, sans déborder ;
+  // un nom sur 2 lignes est un peu plus petit pour garder l'accueil équilibré
+  function fitTown() {
+    townEl.style.fontSize = "";
+    const base = parseFloat(getComputedStyle(townEl).fontSize);
+    const linesAt = (s) => Math.round(townEl.offsetHeight / (s * 0.9));
+    let size = base;
+    for (let i = 0; i < 30; i++) {
+      if (townEl.scrollWidth <= townEl.clientWidth + 1 && linesAt(size) <= 2) break;
+      size *= 0.94;
+      townEl.style.fontSize = `${f(size)}px`;
+    }
+    if (linesAt(size) > 1 && size > base * 0.7) townEl.style.fontSize = `${f(base * 0.7)}px`;
   }
 
   function renderStops() {
@@ -656,15 +684,20 @@
     const words = el.textContent.trim().split(/ +/);
     el.textContent = "";
     words.forEach((w, i) => {
-      const word = document.createElement("span");
-      word.className = "word";
-      for (const c of w) {
-        const ch = document.createElement("span");
-        ch.className = "char";
-        ch.textContent = c;
-        word.appendChild(ch);
-      }
-      el.appendChild(word);
+      // « Pont-Sainte-Maxence » peut passer à la ligne après chaque tiret
+      const parts = w.split("-");
+      parts.forEach((part, j) => {
+        const word = document.createElement("span");
+        word.className = "word";
+        for (const c of j < parts.length - 1 ? part + "-" : part) {
+          const ch = document.createElement("span");
+          ch.className = "char";
+          ch.textContent = c;
+          word.appendChild(ch);
+        }
+        el.appendChild(word);
+        if (j < parts.length - 1) el.appendChild(document.createTextNode("​"));
+      });
       if (i < words.length - 1) el.appendChild(document.createTextNode(" "));
     });
     el.classList.add("is-split");
@@ -880,9 +913,10 @@
     tl.from(".site-header > :not(.nav)", { y: -40, opacity: 0, duration: 1.2, stagger: 0.08 }, 0.1)
       .from(".nav a", { y: -30, opacity: 0, duration: 1.2, stagger: 0.06 }, 0.2)
       .from(".pizza-wrap", { scale: 0.45, rotate: -150, opacity: 0, duration: 2.4 }, 0)
-      .from(".hero-title .char", { yPercent: 118, rotate: 7, duration: 1.5, stagger: 0.05 }, 0.15)
-      .from(".hero-eyebrow", { y: 20, opacity: 0, duration: 1.1 }, 0.35)
-      .from([".hero-text", ".today", ".hero-actions > *"], { y: 34, opacity: 0, duration: 1.3, stagger: 0.09 }, 0.5)
+      .from(".hero-eyebrow", { y: 20, opacity: 0, duration: 1.1 }, 0.1)
+      .from(".today-badge", { y: 20, opacity: 0, duration: 1.1 }, 0.2)
+      .from(".hero-town .char", { yPercent: 118, rotate: 7, duration: 1.5, stagger: 0.04 }, 0.25)
+      .from([".today-hours", ".hero-actions > *"], { y: 30, opacity: 0, duration: 1.3, stagger: 0.08 }, 0.6)
       .from(".badge", { scale: 0, rotate: -200, duration: 1.6 }, 0.8)
       .from(".scroll-hint", { opacity: 0, y: -10, duration: 1 }, 1.2);
     return tl;
@@ -893,6 +927,7 @@
   function startIntro(intro) {
     const fontsReady = document.fonts ? Promise.race([document.fonts.ready, wait(2500)]) : Promise.resolve();
     Promise.all([fontsReady, wait(800)]).then(() => {
+      fitTown();
       root.classList.add("loaded");
       ScrollTrigger.refresh();
       gsap.delayedCall(0.25, () => intro.play());
@@ -1110,8 +1145,18 @@
   moveIndicator();
   requestAnimationFrame(() => tabsEl.classList.add("is-ready"));
   menuBlob.style.backgroundColor = catColor[current];
-  window.addEventListener("resize", debounce(moveIndicator, 120));
-  if (document.fonts) document.fonts.ready.then(moveIndicator);
+  window.addEventListener(
+    "resize",
+    debounce(() => {
+      moveIndicator();
+      fitTown();
+    }, 120)
+  );
+  if (document.fonts)
+    document.fonts.ready.then(() => {
+      moveIndicator();
+      fitTown();
+    });
 
   if (!motion) {
     // Version sans animation : tout est visible, le camion est garé à la dernière étape

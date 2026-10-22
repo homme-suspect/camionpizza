@@ -680,24 +680,6 @@ button {
   animation: pulse 2s ease-in-out infinite;
 }
 
-.hero-title {
-  margin: 20px 0 26px;
-
-  font-family: var(--f-display);
-  font-weight: 400;
-  font-size: clamp(76px, min(14.5vw, 22vh), 230px);
-  line-height: 0.86;
-  letter-spacing: 0.005em;
-}
-
-.hero-text {
-  max-width: 470px;
-  color: var(--ink-2);
-  font-size: clamp(16px, 1.2vw, 18.5px);
-  line-height: 1.65;
-}
-
-.hero-text em,
 .manifesto-text em,
 .menu-aside em,
 .tour-intro em {
@@ -705,16 +687,21 @@ button {
   font-style: italic;
 }
 
-.hero-text em {
-  color: var(--ink);
-  font-size: 1.12em;
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 34px;
+  margin-top: 36px;
 }
 
 .btn {
@@ -805,41 +792,19 @@ button {
   transform: translateY(3px);
 }
 
-/* Emplacement du jour : la pièce maîtresse de l'accueil */
-.today {
-  --state: var(--amber);
-
-  position: relative;
-  isolation: isolate;
-
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: end;
-  column-gap: 24px;
-
-  width: min(100%, 540px);
-  margin-top: 30px;
-  padding: 20px 20px 20px 24px;
-
-  background:
-    radial-gradient(120% 140% at 0% 0%, rgba(227, 30, 36, 0.32), transparent 60%),
-    rgba(28, 20, 16, 0.78);
-  border: 1px solid rgba(255, 122, 26, 0.5);
-  border-radius: 24px;
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 24px 70px -24px rgba(227, 30, 36, 0.75);
+.btn-cream {
+  background: var(--ink);
+  color: var(--paper-ink);
 }
 
-/* Halo qui respire autour de la carte */
-.today::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  z-index: -1;
-  border-radius: inherit;
-  box-shadow: 0 0 0 0 rgba(255, 106, 26, 0.45);
-  animation: halo 2.8s var(--ease-out) infinite;
+.btn-cream::before {
+  background: var(--amber);
+}
+
+/* Emplacement du jour : c'est l'accueil */
+.today {
+  --state: var(--amber);
+  margin-top: 30px;
 }
 
 .today.is-open {
@@ -848,39 +813,52 @@ button {
 
 .today.is-next {
   --state: var(--ink-2);
-  border-color: var(--line);
-  box-shadow: none;
-}
-
-.today.is-next::before {
-  animation: none;
-}
-
-.today-top {
-  grid-column: 1 / -1;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
 }
 
 .today-badge {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
 
-  padding: 7px 13px 7px 11px;
+  padding: 9px 16px 9px 13px;
 
+  background: rgba(246, 239, 228, 0.08);
   background: color-mix(in srgb, var(--state) 16%, transparent);
   border-radius: 999px;
   color: var(--state);
 
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+.hero-town {
+  margin: 30px 0 12px;
+
+  font-family: var(--f-display);
+  font-size: clamp(80px, min(13vw, 24vh), 200px);
+  line-height: 0.9;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+}
+
+/* chaque morceau du nom révèle ses lettres par en dessous */
+.hero-town .word {
+  overflow: hidden;
+  padding-top: 0.3em;
+  margin-top: -0.3em;
+  vertical-align: top;
+}
+
+/* la zone du dégradé monte au-dessus de la lettre pour colorer aussi les accents (É) */
+.hero-town .char {
+  padding-top: 0.25em;
+  margin-top: -0.25em;
+  background: var(--fire);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .today-pulse {
@@ -908,49 +886,8 @@ button {
 
 .today-hours {
   color: var(--ink);
-  font-size: 14px;
+  font-size: clamp(19px, 1.7vw, 25px);
   font-weight: 700;
-  white-space: nowrap;
-}
-
-.today-place {
-  grid-column: 1;
-  font-family: var(--f-display);
-  font-size: clamp(32px, 3vw, 44px);
-  letter-spacing: 0.01em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.today-map {
-  grid-column: 2;
-  grid-row: 2;
-  align-self: center;
-
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 13px 18px;
-
-  background: var(--ink);
-  border-radius: 999px;
-  color: var(--paper-ink);
-
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  white-space: nowrap;
-
-  transition:
-    background-color 0.3s,
-    transform 0.4s var(--ease-out);
-}
-
-.today-map:hover {
-  background: var(--amber);
-  transform: translateY(-2px);
 }
 
 .scroll-hint {
@@ -2072,16 +2009,6 @@ button {
   }
 }
 
-@keyframes halo {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 106, 26, 0.45);
-  }
-  80%,
-  100% {
-    box-shadow: 0 0 0 16px rgba(255, 106, 26, 0);
-  }
-}
-
 @keyframes bounce {
   0%,
   100% {
@@ -2183,13 +2110,28 @@ button {
     max-width: none;
   }
 
-  .hero-title {
-    margin: 16px 0 20px;
-    font-size: clamp(64px, 25vw, 150px);
+  .today {
+    margin-top: 26px;
+  }
+
+  .hero-town {
+    margin: 24px 0 10px;
+    font-size: clamp(64px, 24vw, 150px);
   }
 
   .hero-actions {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .hero-actions .btn-ghost {
+    grid-column: 1 / -1;
+  }
+
+  .hero-actions .btn-sub {
+    display: none;
   }
 
   .btn {
@@ -2198,25 +2140,7 @@ button {
   }
 
   .btn-inner {
-    padding: 17px 22px;
-  }
-
-  .today {
-    width: 100%;
-    margin-top: 26px;
-    padding: 18px;
-  }
-
-  .today-place {
-    font-size: 36px;
-  }
-
-  .today-map {
-    grid-column: 1 / -1;
-    grid-row: auto;
-    justify-content: center;
-    margin-top: 16px;
-    padding: 14px 18px;
+    padding: 17px 16px;
   }
 
   .hero-visual {

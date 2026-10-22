@@ -213,31 +213,20 @@
         </div>
 
         <div class="hero-content">
-          <p class="eyebrow hero-eyebrow"><span class="spark"></span>Pizzas artisanales au feu de bois</p>
+          <h1 class="sr-only">Camion Pizza — La Maison de la Pizza, pizzas artisanales au feu de bois</h1>
+          <p class="eyebrow hero-eyebrow"><span class="spark"></span>Camion pizza · Feu de bois</p>
 
-          <h1 class="hero-title" aria-label="Camion Pizza">
-            <span class="line" data-split>CAMION</span>
-            <span class="line line-fire" data-split>PIZZA</span>
-          </h1>
-
-          <p class="hero-text">
-            Du mercredi au dimanche, notre camion s'installe près de chez vous.
-            <em>Un coup de fil</em>, et votre pizza file au four.
-          </p>
-
-          <!-- Emplacement du jour -->
+          <!-- Emplacement du jour : c'est la première chose qu'on voit -->
           <div class="today" id="today" aria-live="polite">
-            <div class="today-top">
-              <span class="today-badge"><span class="today-pulse" aria-hidden="true"></span><span id="today-kicker">Ce soir</span></span>
-              <span class="today-hours" id="today-hours"></span>
-            </div>
-            <p class="today-place" id="today-location">La tournée</p>
-            <a class="today-map" id="today-map" href="#tournee" target="_blank" rel="noopener">
-              Itinéraire <svg class="icon" aria-hidden="true"><use href="#i-arrow" /></svg>
-            </a>
+            <p class="today-badge"><span class="today-pulse" aria-hidden="true"></span><span id="today-kicker">Du mercredi au dimanche</span></p>
+            <p class="hero-town" id="today-location">La tournée</p>
+            <p class="today-hours" id="today-hours"></p>
           </div>
 
           <div class="hero-actions">
+            <a class="btn btn-cream magnetic" id="today-map" href="#tournee" target="_blank" rel="noopener">
+              <span class="btn-inner">Itinéraire <svg class="icon"><use href="#i-arrow" /></svg></span>
+            </a>
             <a href="tel:+33786966498" class="btn btn-fire magnetic">
               <span class="btn-inner">
                 <svg class="icon"><use href="#i-phone" /></svg>
@@ -250,51 +239,10 @@
           </div>
         </div>
 
-        <a href="#esprit" class="scroll-hint" aria-label="Défiler vers la suite">
-          <span>Défiler</span>
+        <a href="#carte" class="scroll-hint" aria-label="Aller à la carte">
+          <span>La carte</span>
           <i></i>
         </a>
-      </section>
-
-      <!-- =========================
-           BANDEAUX DÉFILANTS
-      ========================== -->
-      <div class="marquees" aria-hidden="true">
-        <div class="marquee marquee-red" data-marquee="1">
-          <div class="marquee-track">
-            <span>Feu de bois</span><b>✦</b><span>Pizzas artisanales</span><b>✦</b><span>Mercredi → Dimanche</span><b>✦</b><span>Commande par téléphone</span><b>✦</b>
-          </div>
-        </div>
-      </div>
-
-      <!-- =========================
-           L'ESPRIT
-      ========================== -->
-      <section id="esprit" class="manifesto">
-        <p class="section-label"><span>(01)</span> L'esprit</p>
-        <p class="manifesto-text" data-words>
-          Un camion, un <em>feu de bois</em> et des pizzas généreuses. Du mercredi au dimanche, on
-          s'installe <em>près de chez vous</em>&nbsp;: vous appelez, on enfourne, vous savourez.
-        </p>
-
-        <ul class="stats">
-          <li>
-            <strong><span data-count="31">31</span></strong>
-            <span>pizzas à la carte</span>
-          </li>
-          <li>
-            <strong><span data-count="5">5</span></strong>
-            <span>soirs par semaine</span>
-          </li>
-          <li>
-            <strong><small>dès</small><span data-count="8.5" data-decimals="2">8,50</span><small>€</small></strong>
-            <span>la Margherita</span>
-          </li>
-          <li>
-            <strong><small>+</small><span data-count="1">1</span><small>€</small></strong>
-            <span>l'ingrédient en plus</span>
-          </li>
-        </ul>
       </section>
 
       <!-- =========================
@@ -305,7 +253,7 @@
 
         <div class="menu-head">
           <div>
-            <p class="section-label"><span>(02)</span> La carte</p>
+            <p class="section-label"><span>(01)</span> La carte</p>
             <h2 class="menu-title">
               <span class="line" data-split>NOTRE</span>
               <span class="line" data-split>CARTE</span>
@@ -351,7 +299,7 @@
       ========================== -->
       <section id="tournee" class="tour">
         <div class="tour-head">
-          <p class="section-label"><span>(03)</span> La tournée</p>
+          <p class="section-label"><span>(02)</span> La tournée</p>
           <h2 class="tour-title">
             <span class="line" data-split>OÙ NOUS</span>
             <span class="line" data-split>TROUVER&nbsp;?</span>
@@ -415,6 +363,47 @@
         </div>
 
         <ol class="stops" id="stops"></ol>
+      </section>
+
+      <!-- =========================
+           BANDEAU DÉFILANT
+      ========================== -->
+      <div class="marquees" aria-hidden="true">
+        <div class="marquee marquee-red" data-marquee="1">
+          <div class="marquee-track">
+            <span>Feu de bois</span><b>✦</b><span>Pizzas artisanales</span><b>✦</b><span>Mercredi → Dimanche</span><b>✦</b><span>Commande par téléphone</span><b>✦</b>
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================
+           L'ESPRIT
+      ========================== -->
+      <section id="esprit" class="manifesto">
+        <p class="section-label"><span>(03)</span> L'esprit</p>
+        <p class="manifesto-text" data-words>
+          Un camion, un <em>feu de bois</em> et des pizzas généreuses. Du mercredi au dimanche, on
+          s'installe <em>près de chez vous</em>&nbsp;: vous appelez, on enfourne, vous savourez.
+        </p>
+
+        <ul class="stats">
+          <li>
+            <strong><span data-count="31">31</span></strong>
+            <span>pizzas à la carte</span>
+          </li>
+          <li>
+            <strong><span data-count="5">5</span></strong>
+            <span>soirs par semaine</span>
+          </li>
+          <li>
+            <strong><small>dès</small><span data-count="8.5" data-decimals="2">8,50</span><small>€</small></strong>
+            <span>la Margherita</span>
+          </li>
+          <li>
+            <strong><small>+</small><span data-count="1">1</span><small>€</small></strong>
+            <span>l'ingrédient en plus</span>
+          </li>
+        </ul>
       </section>
 
       <!-- =========================
