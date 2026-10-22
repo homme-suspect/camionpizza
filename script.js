@@ -105,7 +105,9 @@
           <p class="day-name">${s.name}${tag ? ` <strong>${tag}</strong>` : ""}</p>
           <p class="day-town">${s.town}</p>
           <p class="day-hours">${hoursOf(s)}</p>
-          <a class="day-map" href="${mapUrl(s)}" target="_blank" rel="noopener" aria-label="Itinéraire vers ${s.town}">📍 Itinéraire</a>
+          <a class="day-map" href="${mapUrl(s)}" target="_blank" rel="noopener" aria-label="Itinéraire vers ${s.town}">
+            <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg> Itinéraire
+          </a>
         </li>`;
       })
       .join("");
@@ -208,25 +210,33 @@
     ],
   };
 
-  const titles = { tomate: "Base tomate", creme: "Base crème", pecheurs: "Pizzas pêcheurs" };
+  const titles = { tomate: "Base tomate", creme: "Base crème", pecheurs: "Pêcheurs" };
+  const meat = /jambon|poulet|merguez|lardons|viande|chorizo|saumon|thon|anchois/i;
 
   $("#pizza-menu").innerHTML = Object.entries(pizzas)
     .map(
       ([cat, list]) => `
-      <div class="category category-${cat} reveal" id="${cat}">
-        <h3>${titles[cat]}</h3>
+      <section class="category category-${cat} reveal" id="${cat}">
+        <header class="category-head">
+          <h3>${titles[cat]}</h3>
+          <span>${list.length} pizzas</span>
+        </header>
         <ul class="dishes">
           ${list
             .map(
               (p) => `
             <li class="dish">
-              <div class="dish-top"><span class="dish-name">${p.name}</span><span class="dish-price">${p.price}</span></div>
+              <div class="dish-top">
+                <span class="dish-name">${p.name}</span>
+                ${meat.test(p.ingredients) ? "" : '<span class="veg">Veggie</span>'}
+                <span class="dish-price">${p.price}</span>
+              </div>
               <p class="dish-ing">${p.ingredients}</p>
             </li>`
             )
             .join("")}
         </ul>
-      </div>`
+      </section>`
     )
     .join("");
 

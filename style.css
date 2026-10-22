@@ -1,28 +1,33 @@
 /* =========================
-   CAMION PIZZA — lisible pour tous, avec du caractère
+   CAMION PIZZA — beau, simple, lisible
 ========================= */
 
 :root {
   --dark: #120d0a;
-  --dark-2: #1d1612;
-  --cream: #fbf6ee;
+  --dark-2: #1c1511;
+  --dark-3: #261d18;
+  --cream: #faf4ea;
+  --paper: #fffdf9;
   --white: #ffffff;
   --ink: #1a120d;
-  --muted: #5c4f46;
-  --line: #e4d9cb;
+  --muted: #5f5249;
+  --line: #eadfd0;
   --light-text: #f6efe4;
-  --light-muted: #cfc3b6;
-  --red: #c4161c;
-  --red-dark: #9e1015;
+  --light-muted: #cbbfb2;
+  --red: #c8161d;
+  --red-dark: #a01016;
   --flame: #ff6a1a;
   --amber: #ffb02e;
   --green: #3ddc84;
-  --c-tomate: #c4161c;
+  --c-tomate: #c8161d;
   --c-creme: #1474a8;
   --c-pecheurs: #0b4f80;
   --fire: linear-gradient(180deg, #ffc84a 0%, #ff7a1a 50%, #e31e24 100%);
   --display: "Anton", Impact, "Arial Narrow", sans-serif;
+  --serif: "Fraunces", Georgia, serif;
   --body: "Manrope", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --radius: 20px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -33,7 +38,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 90px;
+  scroll-padding-top: 88px;
 }
 
 body {
@@ -42,6 +47,7 @@ body {
   font-family: var(--body);
   font-size: 19px;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -54,9 +60,16 @@ svg {
   display: block;
 }
 
+.icon {
+  width: 1.1em;
+  height: 1.1em;
+  flex-shrink: 0;
+}
+
 :focus-visible {
   outline: 3px solid var(--amber);
   outline-offset: 3px;
+  border-radius: 8px;
 }
 
 .sr-only {
@@ -68,13 +81,22 @@ svg {
   white-space: nowrap;
 }
 
+/* Petit titre en italique au-dessus des grands titres */
+.kicker {
+  color: var(--flame);
+  font-family: var(--serif);
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 500;
+}
+
 /* Apparition douce au scroll */
 .js .reveal {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(28px);
   transition:
-    opacity 0.7s ease,
-    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.8s ease,
+    transform 0.9s var(--ease);
 }
 
 .js .reveal.is-in {
@@ -93,13 +115,13 @@ svg {
 
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
 
-  padding: 10px 20px;
-  background: rgba(18, 13, 10, 0.92);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(246, 239, 228, 0.1);
+  padding: 10px max(20px, 4vw);
+  background: rgba(18, 13, 10, 0.9);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(246, 239, 228, 0.08);
   color: var(--light-text);
 }
 
@@ -110,23 +132,40 @@ svg {
 
 .nav {
   display: flex;
-  gap: 28px;
+  gap: 32px;
   margin-left: auto;
 }
 
 .nav a {
+  position: relative;
   font-weight: 700;
   text-decoration: none;
 }
 
-.nav a:hover {
-  color: var(--amber);
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 2px;
+  background: var(--amber);
+  transform: scaleX(0);
+  transition: transform 0.4s var(--ease);
+}
+
+.nav a:hover::after {
+  transform: scaleX(1);
 }
 
 .header-call {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
   padding: 12px 22px;
   background: var(--red);
-  border-radius: 12px;
+  border-radius: 999px;
   color: var(--white);
   font-weight: 800;
   text-decoration: none;
@@ -139,7 +178,7 @@ svg {
 }
 
 /* =========================
-   ACCUEIL : EMPLACEMENT DU JOUR + PIZZA
+   ACCUEIL
 ========================= */
 
 .hero {
@@ -148,14 +187,16 @@ svg {
   isolation: isolate;
 
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: 1.05fr 1fr;
   align-items: center;
-  gap: 20px;
+  gap: 32px;
 
   min-height: calc(100vh - 84px);
-  padding: 40px max(20px, 5vw);
+  padding: 48px max(20px, 6vw) 64px;
 
-  background: var(--dark);
+  background:
+    radial-gradient(70% 60% at 85% 40%, rgba(255, 106, 26, 0.12), transparent 70%),
+    var(--dark);
   color: var(--light-text);
 }
 
@@ -166,19 +207,42 @@ svg {
   bottom: -50%;
   z-index: -1;
   height: 90%;
-  background: radial-gradient(50% 50% at 50% 100%, rgba(255, 106, 26, 0.35), rgba(227, 30, 36, 0.12) 45%, transparent 72%);
+  background: radial-gradient(50% 50% at 50% 100%, rgba(255, 106, 26, 0.32), rgba(227, 30, 36, 0.12) 45%, transparent 72%);
 }
+
+/* Petites braises qui montent */
+.sparks {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.sparks i {
+  position: absolute;
+  bottom: -10px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 10px 2px rgba(255, 122, 26, 0.8);
+  opacity: 0;
+  animation: rise 7s linear infinite;
+}
+
+.sparks i:nth-child(1) { left: 8%; animation-delay: 0s; }
+.sparks i:nth-child(2) { left: 18%; animation-delay: 2.4s; animation-duration: 9s; }
+.sparks i:nth-child(3) { left: 30%; animation-delay: 4.1s; }
+.sparks i:nth-child(4) { left: 42%; animation-delay: 1.2s; animation-duration: 8s; }
+.sparks i:nth-child(5) { left: 55%; animation-delay: 3.3s; }
+.sparks i:nth-child(6) { left: 64%; animation-delay: 5.5s; animation-duration: 10s; }
+.sparks i:nth-child(7) { left: 73%; animation-delay: 0.8s; }
+.sparks i:nth-child(8) { left: 82%; animation-delay: 2.9s; animation-duration: 8.5s; }
+.sparks i:nth-child(9) { left: 90%; animation-delay: 4.7s; }
+.sparks i:nth-child(10) { left: 96%; animation-delay: 6.2s; animation-duration: 9.5s; }
 
 .today {
   max-width: 640px;
-}
-
-.hero-brand {
-  color: var(--amber);
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
 }
 
 .today-label {
@@ -188,7 +252,8 @@ svg {
   margin-top: 22px;
   padding: 9px 18px;
 
-  background: rgba(255, 176, 46, 0.15);
+  background: rgba(255, 176, 46, 0.14);
+  border: 1px solid rgba(255, 176, 46, 0.3);
   border-radius: 999px;
   color: var(--amber);
 
@@ -205,7 +270,8 @@ svg {
 }
 
 .today.is-open .today-label {
-  background: rgba(61, 220, 132, 0.15);
+  background: rgba(61, 220, 132, 0.12);
+  border-color: rgba(61, 220, 132, 0.35);
   color: var(--green);
 }
 
@@ -214,7 +280,7 @@ svg {
 }
 
 .today-town {
-  margin: 18px 0 8px;
+  margin: 20px 0 8px;
 
   background: var(--fire);
   -webkit-background-clip: text;
@@ -222,8 +288,8 @@ svg {
   color: transparent;
 
   font-family: var(--display);
-  font-size: clamp(56px, 8vw, 116px);
-  line-height: 1.05;
+  font-size: clamp(58px, 8vw, 120px);
+  line-height: 1.04;
   text-transform: uppercase;
   overflow-wrap: break-word;
 }
@@ -237,65 +303,82 @@ svg {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
-  margin-top: 30px;
+  margin-top: 32px;
 }
 
 .button {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 12px;
 
-  min-height: 74px;
-  padding: 14px 20px;
+  min-height: 76px;
+  padding: 14px 22px;
 
-  border-radius: 16px;
+  border-radius: 18px;
 
   font-size: 22px;
   font-weight: 800;
-  line-height: 1.25;
-  text-align: center;
+  line-height: 1.2;
   text-decoration: none;
 
   transition:
-    background-color 0.2s,
-    color 0.2s,
-    transform 0.2s;
+    background-color 0.25s,
+    color 0.25s,
+    transform 0.25s var(--ease),
+    box-shadow 0.25s;
 }
 
 .button:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+}
+
+.button .icon {
+  width: 26px;
+  height: 26px;
 }
 
 .button span {
-  font-size: 17px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.button small {
+  font-size: 16px;
   font-weight: 700;
+  opacity: 0.9;
 }
 
 .button-red {
   background: var(--red);
   color: var(--white);
-  box-shadow: 0 14px 34px -12px rgba(227, 30, 36, 0.8);
+  box-shadow: 0 16px 36px -14px rgba(227, 30, 36, 0.9);
 }
 
 .button-red:hover {
   background: var(--red-dark);
 }
 
-.button-white {
+.button-light {
   background: var(--light-text);
   color: var(--ink);
 }
 
-.button-white:hover {
+.button-light:hover {
   background: var(--amber);
 }
 
 .button-outline {
-  max-width: 420px;
-  margin: 40px auto 0;
+  max-width: 440px;
+  margin: 48px auto 0;
   border: 2px solid var(--ink);
   font-size: 19px;
+}
+
+.button-outline .icon {
+  width: 22px;
+  height: 22px;
 }
 
 .button-outline:hover {
@@ -304,14 +387,21 @@ svg {
 }
 
 .today-menu {
-  display: inline-block;
-  margin-top: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
   font-size: 20px;
   font-weight: 800;
+  text-underline-offset: 6px;
 }
 
 .today-menu:hover {
   color: var(--amber);
+}
+
+.today-menu .icon {
+  animation: nudge 2s ease-in-out infinite;
 }
 
 /* La grande pizza qui tourne */
@@ -327,8 +417,8 @@ svg {
   inset: 4%;
   border-radius: 50%;
   box-shadow:
-    0 40px 80px -20px rgba(0, 0, 0, 0.8),
-    0 0 110px 10px rgba(255, 106, 26, 0.18);
+    0 44px 90px -20px rgba(0, 0, 0, 0.85),
+    0 0 120px 14px rgba(255, 106, 26, 0.2);
 }
 
 .pizza {
@@ -339,18 +429,110 @@ svg {
   animation: spin 50s linear infinite;
 }
 
+.steam {
+  position: absolute;
+  top: -10%;
+  left: 36%;
+  z-index: 1;
+  width: 28%;
+  overflow: visible;
+  filter: blur(7px);
+  pointer-events: none;
+}
+
+.steam path {
+  fill: none;
+  stroke: rgba(255, 244, 228, 0.22);
+  stroke-width: 9;
+  stroke-linecap: round;
+  opacity: 0;
+  animation: steam 5.5s ease-in-out infinite;
+}
+
+.steam path:nth-child(2) {
+  animation-delay: 1.8s;
+}
+
+.steam path:nth-child(3) {
+  animation-delay: 3.6s;
+}
+
+/* =========================
+   POINTS FORTS
+========================= */
+
+.perks {
+  position: relative;
+  z-index: 2;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  max-width: 1100px;
+  margin: -44px auto 0;
+  padding: 0 20px;
+  list-style: none;
+}
+
+.perks li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  padding: 24px 26px;
+  background: var(--paper);
+  box-shadow: 0 18px 40px -24px rgba(26, 18, 13, 0.35);
+}
+
+.perks li:first-child {
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.perks li:last-child {
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.perks li + li {
+  border-left: 1px solid var(--line);
+}
+
+.perks .icon {
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  border-radius: 50%;
+  background: #fde6d6;
+  color: var(--red);
+}
+
+.perks span {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.perks strong {
+  display: block;
+  color: var(--ink);
+  font-size: 18px;
+}
+
 /* =========================
    SECTIONS
 ========================= */
 
 .section {
-  padding: 64px 20px;
+  padding: 88px 20px;
 }
 
 .section > * {
-  max-width: 900px;
+  max-width: 940px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.section-head {
+  text-align: center;
 }
 
 .section-dark {
@@ -360,17 +542,15 @@ svg {
 
 h2 {
   font-family: var(--display);
-  font-size: clamp(42px, 8vw, 64px);
+  font-size: clamp(46px, 8vw, 72px);
   font-weight: 400;
-  line-height: 1.1;
-  text-align: center;
+  line-height: 1.05;
   text-transform: uppercase;
 }
 
 .section-intro {
-  margin-top: 8px;
+  margin-top: 10px;
   color: var(--muted);
-  text-align: center;
 }
 
 .section-dark .section-intro {
@@ -383,16 +563,16 @@ h2 {
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
-  margin-top: 26px;
+  margin-top: 30px;
 }
 
 .jump a {
-  padding: 12px 20px;
-  border-radius: 12px;
+  padding: 13px 24px;
+  border-radius: 999px;
   color: var(--white);
   font-weight: 800;
   text-decoration: none;
-  transition: transform 0.2s;
+  transition: transform 0.25s var(--ease);
 }
 
 .jump a:hover {
@@ -411,45 +591,70 @@ h2 {
   background: var(--c-pecheurs);
 }
 
-/* Liste des pizzas */
+/* Une catégorie = une belle fiche de menu */
 .category {
-  margin-top: 48px;
+  --cat: var(--c-tomate);
+
+  margin-top: 40px;
+  overflow: hidden;
+
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 50px -36px rgba(26, 18, 13, 0.45);
 }
 
-.category h3 {
-  padding: 12px 18px;
-  border-radius: 12px;
+.category-creme {
+  --cat: var(--c-creme);
+}
+
+.category-pecheurs {
+  --cat: var(--c-pecheurs);
+}
+
+.category-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding: 18px 28px;
+  background: var(--cat);
   color: var(--white);
-  font-size: 24px;
-  font-weight: 800;
+}
+
+.category-head h3 {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
-.category-tomate h3 {
-  background: var(--c-tomate);
-}
-
-.category-creme h3 {
-  background: var(--c-creme);
-}
-
-.category-pecheurs h3 {
-  background: var(--c-pecheurs);
+.category-head span {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-style: italic;
+  opacity: 0.9;
 }
 
 .dishes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 40px;
+  padding: 8px 28px 20px;
   list-style: none;
 }
 
 .dish {
-  padding: 16px 6px;
+  padding: 18px 0;
   border-bottom: 1px solid var(--line);
 }
 
 .dish-top {
   display: flex;
   align-items: baseline;
-  gap: 12px;
+  gap: 10px;
 }
 
 /* pointillés entre le nom et le prix, comme sur un menu */
@@ -457,41 +662,42 @@ h2 {
   content: "";
   order: 1;
   flex: 1;
-  min-width: 20px;
-  border-bottom: 2px dotted rgba(26, 18, 13, 0.25);
+  min-width: 16px;
+  border-bottom: 2px dotted rgba(26, 18, 13, 0.22);
   transform: translateY(-6px);
 }
 
 .dish-name {
   font-family: var(--display);
-  font-size: 25px;
+  font-size: 24px;
   letter-spacing: 0.02em;
+  line-height: 1.15;
   text-transform: uppercase;
+}
+
+.veg {
+  align-self: center;
+  padding: 3px 9px;
+  background: #e2f2e6;
+  border-radius: 999px;
+  color: #1d6b37;
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .dish-price {
   order: 2;
+  color: var(--cat);
   font-family: var(--display);
-  font-size: 25px;
+  font-size: 24px;
   white-space: nowrap;
-}
-
-.category-tomate .dish-price {
-  color: var(--c-tomate);
-}
-
-.category-creme .dish-price {
-  color: var(--c-creme);
-}
-
-.category-pecheurs .dish-price {
-  color: var(--c-pecheurs);
 }
 
 .dish-ing {
   margin-top: 4px;
   color: var(--muted);
-  font-size: 18px;
+  font-size: 17px;
+  line-height: 1.45;
 }
 
 /* =========================
@@ -501,7 +707,7 @@ h2 {
 .week {
   display: grid;
   gap: 14px;
-  margin-top: 32px;
+  margin-top: 40px;
   list-style: none;
 }
 
@@ -509,39 +715,49 @@ h2 {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 4px 16px;
+  gap: 2px 16px;
 
-  padding: 20px 22px;
+  padding: 22px 26px;
 
   background: var(--dark-2);
-  border: 2px solid rgba(246, 239, 228, 0.1);
-  border-radius: 18px;
+  border: 1px solid rgba(246, 239, 228, 0.1);
+  border-radius: var(--radius);
+  transition: border-color 0.3s;
+}
+
+.day:hover {
+  border-color: rgba(246, 239, 228, 0.25);
 }
 
 .day.is-today {
-  background: linear-gradient(135deg, rgba(227, 30, 36, 0.25), rgba(255, 106, 26, 0.08));
+  background: linear-gradient(120deg, rgba(227, 30, 36, 0.28), rgba(255, 106, 26, 0.08) 70%);
   border-color: var(--flame);
+  box-shadow: 0 20px 50px -30px rgba(255, 106, 26, 0.9);
 }
 
 .day-name {
   color: var(--amber);
-  font-size: 18px;
-  font-weight: 800;
-  text-transform: uppercase;
+  font-family: var(--serif);
+  font-size: 21px;
+  font-style: italic;
 }
 
 .day-name strong {
-  margin-left: 8px;
-  padding: 3px 10px;
+  margin-left: 10px;
+  padding: 3px 12px;
   background: var(--red);
   border-radius: 999px;
   color: var(--white);
-  font-size: 14px;
+  font-family: var(--body);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 800;
+  vertical-align: 3px;
 }
 
 .day-town {
   font-family: var(--display);
-  font-size: 30px;
+  font-size: 32px;
   line-height: 1.15;
   text-transform: uppercase;
 }
@@ -556,9 +772,14 @@ h2 {
   grid-column: 2;
   grid-row: 1 / span 3;
 
-  padding: 14px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 14px 20px;
   background: var(--light-text);
-  border-radius: 12px;
+  border-radius: 999px;
   color: var(--ink);
   font-weight: 800;
   text-decoration: none;
@@ -579,7 +800,7 @@ h2 {
   overflow: hidden;
   isolation: isolate;
 
-  padding: 72px 20px;
+  padding: 96px 20px 104px;
   background: #0a0706;
   color: var(--light-text);
   text-align: center;
@@ -591,8 +812,14 @@ h2 {
   right: -25%;
   bottom: -10%;
   z-index: -1;
-  height: 80%;
+  height: 85%;
   background: radial-gradient(48% 70% at 50% 100%, rgba(255, 122, 26, 0.45), rgba(227, 30, 36, 0.2) 45%, transparent 75%);
+  animation: breathe 6s ease-in-out infinite;
+}
+
+.order h2 {
+  font-size: clamp(56px, 11vw, 120px);
+  line-height: 0.95;
 }
 
 .order h2 span {
@@ -603,30 +830,41 @@ h2 {
   color: transparent;
 }
 
-.order p {
-  margin-top: 10px;
+.order-text {
+  margin-top: 16px;
   color: var(--light-muted);
   font-size: 21px;
 }
 
 .order-phone {
-  display: inline-block;
-  margin-top: 24px;
-  padding: 18px 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 30px;
+  padding: 20px 36px;
 
   background: var(--red);
-  border-radius: 18px;
+  border-radius: 999px;
   color: var(--white);
-  box-shadow: 0 18px 44px -14px rgba(227, 30, 36, 0.9);
+  box-shadow: 0 20px 50px -14px rgba(227, 30, 36, 0.95);
 
   font-family: var(--display);
-  font-size: clamp(32px, 8vw, 52px);
+  font-size: clamp(32px, 7vw, 52px);
+  letter-spacing: 0.02em;
   text-decoration: none;
-  transition: background-color 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.25s var(--ease);
 }
 
 .order-phone:hover {
   background: var(--red-dark);
+  transform: translateY(-3px);
+}
+
+.order-phone .icon {
+  width: 0.8em;
+  height: 0.8em;
 }
 
 /* =========================
@@ -637,18 +875,46 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 
-  padding: 36px 20px 40px;
+  padding: 48px 20px 44px;
   background: var(--dark);
   color: var(--light-muted);
-  font-size: 15px;
   text-align: center;
+}
+
+.footer img {
+  width: 96px;
+  height: auto;
+  margin-bottom: 6px;
+}
+
+.footer-line {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-style: italic;
+}
+
+.footer-phone {
+  color: var(--light-text);
+  font-family: var(--display);
+  font-size: 30px;
+  text-decoration: none;
+}
+
+.footer-copy {
+  margin-top: 10px;
+  font-size: 14px;
+  opacity: 0.7;
 }
 
 .call-bar {
   display: none;
 }
+
+/* =========================
+   ANIMATIONS
+========================= */
 
 @keyframes spin {
   to {
@@ -662,27 +928,93 @@ h2 {
   }
 }
 
+@keyframes nudge {
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.75;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes steam {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scaleX(0.8);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) scaleX(1.25);
+  }
+}
+
+@keyframes rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+  15% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(30px, -70vh) scale(0.4);
+  }
+}
+
 /* =========================
-   TABLETTE ET TÉLÉPHONE
+   TABLETTE
 ========================= */
 
 @media (max-width: 900px) {
   .hero {
     grid-template-columns: 1fr;
     min-height: 0;
-    padding: 32px 20px 0;
+    padding: 36px 20px 0;
     text-align: center;
   }
 
   .today {
+    width: 100%;
     margin: 0 auto;
   }
 
   .hero-pizza {
     width: min(110%, 520px);
-    margin-bottom: -35%;
+    margin-bottom: -38%;
+  }
+
+  .perks {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .perks li,
+  .perks li:first-child,
+  .perks li:last-child {
+    border-radius: var(--radius);
+  }
+
+  .perks li + li {
+    border-left: 0;
+  }
+
+  .dishes {
+    grid-template-columns: 1fr;
   }
 }
+
+/* =========================
+   TÉLÉPHONE
+========================= */
 
 @media (max-width: 700px) {
   body {
@@ -705,6 +1037,22 @@ h2 {
     grid-template-columns: 1fr;
   }
 
+  .section {
+    padding: 64px 16px;
+  }
+
+  .category-head {
+    padding: 16px 20px;
+  }
+
+  .category-head h3 {
+    font-size: 28px;
+  }
+
+  .dishes {
+    padding: 4px 20px 14px;
+  }
+
   .dish-name,
   .dish-price {
     font-size: 22px;
@@ -712,13 +1060,14 @@ h2 {
 
   .day {
     grid-template-columns: 1fr;
+    padding: 20px;
   }
 
   .day-map {
     grid-column: auto;
     grid-row: auto;
-    margin-top: 10px;
-    text-align: center;
+    margin-top: 12px;
+    padding: 15px 20px;
   }
 
   .call-bar {
@@ -728,7 +1077,10 @@ h2 {
     bottom: 0;
     z-index: 20;
 
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
 
     background: var(--red);
@@ -736,15 +1088,15 @@ h2 {
 
     font-size: 21px;
     font-weight: 800;
-    text-align: center;
     text-decoration: none;
     box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.2);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pizza,
-  .today-label::before {
+  *,
+  *::before,
+  *::after {
     animation: none !important;
   }
 
@@ -752,5 +1104,9 @@ h2 {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  html {
+    scroll-behavior: auto;
   }
 }
