@@ -29,7 +29,8 @@
   // LA TOURNÉE
   // =========================
 
-  // spot : où se gare le camion · map : recherche envoyée à Google Maps
+  // spot : où se gare le camion (non affiché, lu par les lecteurs d'écran)
+  // map : adresse ouverte par le bouton Itinéraire
   const schedule = [
     {
       day: 3,
@@ -135,7 +136,6 @@
     $("#today-kicker").textContent = status.kicker;
     $("#today-location").textContent = status.place;
     $("#today-hours").textContent = status.detail;
-    $("#today-spot").textContent = status.stop.spot;
     const map = $("#today-map");
     map.href = mapUrl(status.stop);
     map.setAttribute("aria-label", `Itinéraire vers ${status.stop.town}, ${status.stop.spot}`);
@@ -154,8 +154,7 @@
           <p class="stop-day">${s.name}</p>
           <h3 class="stop-town">${s.town}</h3>
           <p class="stop-hours">${hoursOf(s)}</p>
-          <p class="stop-spot"><svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>${s.spot}</p>
-          <a class="stop-map" href="${mapUrl(s)}" target="_blank" rel="noopener">
+          <a class="stop-map" href="${mapUrl(s)}" target="_blank" rel="noopener" aria-label="Itinéraire vers ${s.town}, ${s.spot}">
             Itinéraire <svg class="icon"><use href="#i-arrow" /></svg>
           </a>
         </li>`;

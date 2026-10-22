@@ -886,28 +886,10 @@ button {
   text-transform: uppercase;
 }
 
-.today-spot {
-  grid-column: 1;
-
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-top: 10px;
-
-  color: var(--ink-2);
-  font-size: 15px;
-  line-height: 1.4;
-}
-
-.today-spot .icon {
-  margin-top: 1px;
-  color: var(--flame);
-}
-
 .today-map {
   grid-column: 2;
-  grid-row: 2 / span 2;
-  align-self: end;
+  grid-row: 2;
+  align-self: center;
 
   display: inline-flex;
   align-items: center;
@@ -1638,27 +1620,6 @@ button {
   font-weight: 800;
   font-size: 15px;
   letter-spacing: 0.04em;
-}
-
-.stop-spot {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 6px;
-
-  max-width: 22ch;
-  margin-top: 8px;
-
-  color: var(--ink-2);
-  font-size: 13.5px;
-  line-height: 1.4;
-}
-
-.stop-spot .icon {
-  width: 14px;
-  height: 14px;
-  margin-top: 2px;
-  color: var(--flame);
 }
 
 .stop-map {
@@ -2404,12 +2365,6 @@ button {
 
   .stop-town {
     font-size: 28px;
-  }
-
-  .stop-spot {
-    justify-content: flex-start;
-    max-width: none;
-    font-size: 14.5px;
   }
 
   .stop-badge {
