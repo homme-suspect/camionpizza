@@ -85,12 +85,31 @@
     }
   }
 
+  // Nom de la ville découpé en lettres pour l'animation d'entrée
+  // (passage à la ligne possible après chaque tiret, nom lu en entier par les lecteurs d'écran)
+  function renderTown(town) {
+    const el = $("#today-location");
+    if (el.dataset.town === town) return;
+    el.dataset.town = town;
+    let i = 0;
+    const parts = town.split("-");
+    const letters = parts
+      .map((part, j) => {
+        const seg = j < parts.length - 1 ? part + "-" : part;
+        const chars = [...seg].map((c) => `<span class="ch" style="--i:${i++}">${c}</span>`).join("");
+        return `<span class="seg">${chars}</span>`;
+      })
+      .join("​");
+    el.innerHTML = `<span class="sr-only">${town}</span><span aria-hidden="true">${letters}</span>`;
+    el.classList.add("is-split");
+  }
+
   function render() {
     const st = getStatus();
     const box = $(".today");
     box.classList.toggle("is-open", st.state === "open");
     $("#today-kicker").textContent = st.label;
-    $("#today-location").textContent = st.stop.town;
+    renderTown(st.stop.town);
     $("#today-hours").textContent = st.hours;
     const map = $("#today-map");
     map.href = mapUrl(st.stop);
@@ -224,8 +243,8 @@
         <ul class="dishes">
           ${list
             .map(
-              (p) => `
-            <li class="dish">
+              (p, i) => `
+            <li class="dish" style="--i:${Math.min(i, 12)}">
               <div class="dish-top">
                 <span class="dish-name">${p.name}</span>
                 ${meat.test(p.ingredients) ? "" : '<span class="veg">Veggie</span>'}
@@ -436,8 +455,41 @@
     items.forEach((el) => io.observe(el));
   }
 
+  // =========================
+  // AU SCROLL : la pizza tourne un peu plus, la barre de progression avance
+  // =========================
+
+  function initScroll() {
+    const pizza = $(".hero-pizza");
+    const bar = $(".progress");
+    let ticking = false;
+    const update = () => {
+      const y = window.scrollY;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (pizza) pizza.style.setProperty("--r", (y * 0.15).toFixed(1));
+      if (bar) bar.style.transform = `scaleX(${max > 0 ? Math.min(y / max, 1) : 0})`;
+      ticking = false;
+    };
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true }
+    );
+    update();
+  }
+
+  // Le bandeau est doublé pour défiler sans trou, même sur grand écran
+  const band = $(".band-track");
+  if (band) band.innerHTML += band.innerHTML;
+
   buildPizza($("#pizza"));
   render();
   initReveal();
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) initScroll();
   setInterval(render, 60000);
 })();

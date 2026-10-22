@@ -80,6 +80,8 @@
       </symbol>
     </svg>
 
+    <div class="progress" aria-hidden="true"></div>
+
     <!-- =========================
          EN-TÊTE
     ========================== -->
@@ -142,15 +144,15 @@
 
       <!-- Trois points forts -->
       <ul class="perks">
-        <li>
+        <li class="reveal" style="--d:0s">
           <svg class="icon" aria-hidden="true"><use href="#i-flame" /></svg>
           <span><strong>Cuites au feu de bois</strong>Dans le four du camion</span>
         </li>
-        <li>
+        <li class="reveal" style="--d:0.12s">
           <svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg>
           <span><strong>Commande par téléphone</strong>Elle vous attend au camion</span>
         </li>
-        <li>
+        <li class="reveal" style="--d:0.24s">
           <svg class="icon" aria-hidden="true"><use href="#i-truck" /></svg>
           <span><strong>5 villes, 5 soirs</strong>Du mercredi au dimanche</span>
         </li>
@@ -190,8 +192,20 @@
           <h2>Où nous trouver ?</h2>
           <p class="section-intro">Du mercredi au dimanche · Fermé le lundi et le mardi</p>
         </div>
+        <div class="road reveal" aria-hidden="true">
+          <span class="road-line"></span>
+          <svg class="road-truck"><use href="#i-truck" /></svg>
+        </div>
         <ul class="week reveal" id="week"></ul>
       </section>
+
+      <!-- Bandeau défilant -->
+      <div class="band" aria-hidden="true">
+        <div class="band-track">
+          <span>Feu de bois</span><b>✦</b><span>Pizzas artisanales</span><b>✦</b><span>Mercredi → Dimanche</span><b>✦</b><span>07 86 96 64 98</span><b>✦</b>
+          <span>Feu de bois</span><b>✦</b><span>Pizzas artisanales</span><b>✦</b><span>Mercredi → Dimanche</span><b>✦</b><span>07 86 96 64 98</span><b>✦</b>
+        </div>
+      </div>
 
       <!-- =========================
            COMMANDER

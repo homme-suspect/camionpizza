@@ -104,6 +104,10 @@ svg {
   transform: none;
 }
 
+.js .reveal {
+  transition-delay: var(--d, 0s);
+}
+
 /* =========================
    EN-TÊTE
 ========================= */
@@ -966,6 +970,303 @@ h2 {
   100% {
     opacity: 0;
     transform: translate(30px, -70vh) scale(0.4);
+  }
+}
+
+/* =========================
+   MOTION DESIGN
+========================= */
+
+/* Barre de progression en haut */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  height: 4px;
+  background: linear-gradient(90deg, #e31e24, #ff6a1a 55%, #ffb02e);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* Entrée de l'accueil, en cascade */
+.header {
+  animation: drop 0.8s var(--ease) both;
+}
+
+.hero .kicker {
+  animation: up 0.9s var(--ease) 0.1s both;
+}
+
+.today-label {
+  animation: pop 0.8s var(--ease) 0.25s both;
+}
+
+.today-hours {
+  animation: up 0.9s var(--ease) 0.75s both;
+}
+
+.today-buttons .button:nth-child(1) {
+  animation: up 0.9s var(--ease) 0.9s both;
+}
+
+.today-buttons .button:nth-child(2) {
+  animation: up 0.9s var(--ease) 1s both;
+}
+
+.today-menu {
+  animation: up 0.9s var(--ease) 1.15s both;
+}
+
+/* Les lettres de la ville montent une par une */
+.today-town.is-split {
+  background: none;
+}
+
+.today-town .seg {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.today-town .ch {
+  display: inline-block;
+  padding-top: 0.2em;
+  margin-top: -0.2em;
+  background: var(--fire);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: letter 0.9s var(--ease) both;
+  animation-delay: calc(0.35s + var(--i) * 45ms);
+}
+
+/* La pizza arrive en tournoyant, puis tourne aussi avec le scroll */
+.hero-pizza {
+  rotate: calc(var(--r, 0) * 1deg);
+  animation: pizza-in 1.8s var(--ease) 0.15s both;
+}
+
+/* Reflet qui passe sur le bouton rouge au survol */
+.button-red {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-red::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.7s var(--ease);
+}
+
+.button-red:hover::after {
+  left: 130%;
+}
+
+/* Les pizzas de la carte apparaissent en cascade */
+.js .category .dish {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.7s var(--ease);
+  transition-delay: calc(0.15s + var(--i, 0) * 45ms);
+}
+
+.js .category.is-in .dish {
+  opacity: 1;
+  transform: none;
+}
+
+/* Le petit camion qui roule */
+.road {
+  position: relative;
+  overflow: hidden;
+  max-width: 560px;
+  height: 46px;
+  margin: 30px auto 0;
+}
+
+.road-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 36px;
+  border-top: 3px dashed rgba(246, 239, 228, 0.22);
+}
+
+.road-truck {
+  position: absolute;
+  top: 0;
+  left: -50px;
+  width: 38px;
+  height: 38px;
+  color: var(--amber);
+  animation:
+    drive 8s linear infinite,
+    bump 0.35s ease-in-out infinite alternate;
+}
+
+/* Les jours arrivent un par un, le jour actuel brille */
+.js .week .day {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.7s var(--ease),
+    border-color 0.3s;
+}
+
+.js .week.is-in .day {
+  opacity: 1;
+  transform: none;
+}
+
+.week .day:nth-child(2) { transition-delay: 0.08s; }
+.week .day:nth-child(3) { transition-delay: 0.16s; }
+.week .day:nth-child(4) { transition-delay: 0.24s; }
+.week .day:nth-child(5) { transition-delay: 0.32s; }
+
+.day.is-today {
+  animation: glow 2.8s ease-in-out infinite;
+}
+
+/* Bandeau qui défile */
+.band {
+  overflow: hidden;
+  padding: 14px 0 12px;
+  background: var(--red);
+  color: var(--light-text);
+  font-family: var(--display);
+  font-size: clamp(24px, 3vw, 36px);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.band-track {
+  display: inline-flex;
+  align-items: center;
+  animation: band 40s linear infinite;
+}
+
+.band-track > * {
+  margin-right: 0.6em;
+}
+
+.band-track b {
+  color: var(--amber);
+  font-size: 0.6em;
+}
+
+/* Le bouton d'appel « sonne » */
+.order-phone {
+  position: relative;
+}
+
+.order-phone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  animation: ring 2.4s ease-out infinite;
+}
+
+.order-phone .icon {
+  animation: shake 2.4s ease-in-out infinite;
+}
+
+@keyframes up {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+}
+
+@keyframes drop {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes letter {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em) rotate(8deg);
+  }
+}
+
+@keyframes pizza-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5) rotate(-160deg);
+  }
+}
+
+@keyframes drive {
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes bump {
+  to {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes glow {
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 106, 26, 0.15), 0 20px 50px -24px rgba(255, 106, 26, 1);
+  }
+}
+
+@keyframes band {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(227, 30, 36, 0.6);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 26px rgba(227, 30, 36, 0);
+  }
+}
+
+@keyframes shake {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0);
+  }
+  75% {
+    transform: rotate(-16deg);
+  }
+  80% {
+    transform: rotate(14deg);
+  }
+  85% {
+    transform: rotate(-10deg);
+  }
+  90% {
+    transform: rotate(6deg);
   }
 }
 
