@@ -7,10 +7,10 @@
     <title>Camion Pizza · Pizzas au feu de bois | La Maison de la Pizza</title>
     <meta
       name="description"
-      content="Le camion pizza de La Maison de la Pizza : pizzas au feu de bois, du mercredi au dimanche à Béthisy-Saint-Martin, Moru, Cinqueux, Saint-Sauveur et Pont-Sainte-Maxence. Commandez au 07 86 96 64 98."
+      content="Le camion pizza de La Maison de la Pizza : pizzas artisanales au feu de bois, du mercredi au dimanche à Béthisy-Saint-Martin, Moru, Cinqueux, Saint-Sauveur et Pont-Sainte-Maxence. Commandez au 07 86 96 64 98."
     />
-    <meta name="theme-color" content="#f4ecdf" />
-    <!-- Le site est conçu en clair : on empêche les navigateurs / extensions de l’assombrir automatiquement -->
+    <meta name="theme-color" content="#0e0b09" />
+    <!-- Couleurs voulues : on empêche les navigateurs / extensions de les inverser -->
     <meta name="color-scheme" content="only light" />
     <meta name="darkreader-lock" />
     <link rel="canonical" href="https://camionpizza.net/" />
@@ -19,7 +19,10 @@
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:site_name" content="La Maison de la Pizza" />
     <meta property="og:title" content="Camion Pizza · Pizzas au feu de bois" />
-    <meta property="og:description" content="Du mercredi au dimanche près de chez vous. Commandez au 07 86 96 64 98." />
+    <meta
+      property="og:description"
+      content="Du mercredi au dimanche près de chez vous. Commandez au 07 86 96 64 98."
+    />
     <meta property="og:url" content="https://camionpizza.net/" />
     <meta property="og:image" content="https://camionpizza.net/image/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
@@ -33,10 +36,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Manrope:wght@500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap"
     />
     <link rel="stylesheet" href="style.css" />
-    <script>document.documentElement.classList.add("js");</script>
+
+    <script>
+      // Active les animations seulement si le JS tourne (sinon tout reste visible)
+      (function () {
+        var d = document.documentElement;
+        d.classList.add("js");
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("reduced");
+        // Filet de sécurité : l'écran de chargement ne reste jamais plus de 8 s
+        setTimeout(function () { d.classList.add("loaded"); }, 8000);
+      })();
+    </script>
 
     <script type="application/ld+json">
       {
@@ -66,182 +79,413 @@
     <!-- Icônes -->
     <svg width="0" height="0" style="position: absolute" aria-hidden="true">
       <symbol id="i-phone" viewBox="0 0 24 24">
-        <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"
+        />
       </symbol>
-      <symbol id="i-pin" viewBox="0 0 24 24">
-        <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z" />
-        <circle cx="12" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
-      </symbol>
-      <symbol id="i-flame" viewBox="0 0 24 24">
-        <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M12 2.5c1.5 4.5 7 7.5 7 13a7 7 0 0 1-14 0c0-3.5 2-5.5 3-7.5.5 2.5 1.5 3.5 2.5 3.5-.5-4 0-7 1.5-9Z" />
-      </symbol>
-      <symbol id="i-truck" viewBox="0 0 24 24">
-        <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M3 6h11v10H3zM14 9h4l3 3.5V16h-7M7.5 19a1.8 1.8 0 1 0 0-.1M17.5 19a1.8 1.8 0 1 0 0-.1" />
+      <symbol id="i-arrow" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M7 17 17 7M8 7h9v9" />
       </symbol>
       <symbol id="i-down" viewBox="0 0 24 24">
-        <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m-6-6 6 6 6-6" />
+        <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m-6-6 6 6 6-6" />
+      </symbol>
+      <symbol id="i-leaf" viewBox="0 0 24 24">
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10ZM2 21c0-3 1.85-5.36 5.08-6"
+        />
       </symbol>
     </svg>
+
+    <!-- Écran de chargement : une petite pizza qui tourne -->
+    <div class="loader" aria-hidden="true">
+      <svg class="loader-pizza" viewBox="-50 -50 100 100">
+        <circle r="48" fill="#d9924a" />
+        <circle r="46.5" fill="none" stroke="#a85d27" stroke-width="3" />
+        <circle r="39" fill="#c8301c" />
+        <path
+          d="M0 0V-39M0 0V39M0 0H39M0 0H-39M0 0L27.6 27.6M0 0L-27.6 27.6M0 0L27.6 -27.6M0 0L-27.6 -27.6"
+          stroke="#5a1a0c"
+          stroke-opacity=".35"
+          stroke-width="1.2"
+        />
+        <g fill="#fbe8b8">
+          <circle cx="-14" cy="-19" r="8" />
+          <circle cx="17" cy="-12" r="9" />
+          <circle cx="-3" cy="10" r="10" />
+          <circle cx="22" cy="17" r="7" />
+          <circle cx="-25" cy="11" r="6.5" />
+          <circle cx="5" cy="-30" r="5" />
+          <circle cx="2" cy="31" r="5.5" />
+        </g>
+        <g fill="#2e7d32">
+          <ellipse cx="6" cy="-4" rx="5.5" ry="2.8" transform="rotate(-30 6 -4)" />
+          <ellipse cx="-17" cy="-3" rx="5.5" ry="2.8" transform="rotate(40 -17 -3)" />
+          <ellipse cx="14" cy="28" rx="5" ry="2.5" transform="rotate(10 14 28)" />
+        </g>
+        <g fill="#1d1a17">
+          <circle cx="-8" cy="-31" r="2.8" />
+          <circle cx="29" cy="2" r="2.8" />
+          <circle cx="-20" cy="24" r="2.8" />
+        </g>
+      </svg>
+    </div>
 
     <div class="progress" aria-hidden="true"></div>
 
     <!-- =========================
-         EN-TÊTE
+         HEADER
     ========================== -->
-    <header class="header">
-      <a href="#" class="brand" aria-label="La Maison de la Pizza — haut de page">
-        <img src="image/logo-light.png" alt="La Maison de la Pizza" width="66" height="63" />
+    <header class="site-header">
+      <a href="#accueil" class="brand" aria-label="La Maison de la Pizza — retour en haut">
+        <img src="image/logo.png" alt="La Maison de la Pizza" width="72" height="68" />
       </a>
-      <nav class="nav" aria-label="Navigation">
-        <a href="#carte">La carte</a>
-        <a href="#tournee">Où nous trouver</a>
+
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="#carte" class="roll"><span data-text="La carte">La carte</span></a>
+        <a href="#tournee" class="roll"><span data-text="La tournée">La tournée</span></a>
+        <a href="#contact" class="roll"><span data-text="Contact">Contact</span></a>
       </nav>
-      <a href="tel:+33786966498" class="header-call">
-        <svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg> Appeler
+
+      <a href="tel:+33786966498" class="header-cta magnetic">
+        <svg class="icon"><use href="#i-phone" /></svg>
+        <span>Commander</span>
       </a>
+
+      <button class="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="menu-overlay">
+        <span></span><span></span>
+      </button>
     </header>
+
+    <!-- Menu mobile -->
+    <div class="menu-overlay" id="menu-overlay" aria-hidden="true">
+      <nav class="menu-overlay-nav" aria-label="Menu mobile">
+        <a href="#accueil"><small>01</small>Accueil</a>
+        <a href="#carte"><small>02</small>La carte</a>
+        <a href="#tournee"><small>03</small>La tournée</a>
+        <a href="#contact"><small>04</small>Commander</a>
+      </nav>
+      <div class="menu-overlay-foot">
+        <p class="status-line" data-status-short></p>
+        <a href="tel:+33786966498" class="menu-overlay-phone">07 86 96 64 98</a>
+      </div>
+    </div>
 
     <main>
       <!-- =========================
-           ACCUEIL : OÙ EST LE CAMION
+           ACCUEIL
       ========================== -->
-      <section class="hero" id="aujourdhui">
-        <div class="today" aria-live="polite">
-          <h1 class="sr-only">Camion Pizza — La Maison de la Pizza, pizzas au feu de bois</h1>
-          <p class="eyebrow">Camion pizza <span>·</span> Feu de bois</p>
-
-          <p class="today-label" id="today-kicker">Où est le camion ?</p>
-          <p class="today-town" id="today-location">Du mercredi au dimanche</p>
-          <p class="today-hours" id="today-hours"></p>
-
-          <div class="today-buttons">
-            <a href="tel:+33786966498" class="button button-main">
-              <svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg>
-              <span>Commander<small>07 86 96 64 98</small></span>
-            </a>
-            <a href="#tournee" class="button button-soft" id="today-map" target="_blank" rel="noopener">
-              <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>
-              <span>Itinéraire</span>
-            </a>
-          </div>
-
-          <a href="#carte" class="today-menu">
-            Voir la carte des pizzas <svg class="icon" aria-hidden="true"><use href="#i-down" /></svg>
-          </a>
-        </div>
+      <section id="accueil" class="hero">
+        <canvas class="embers" data-embers="hero" aria-hidden="true"></canvas>
+        <div class="hero-glow" aria-hidden="true"></div>
 
         <div class="hero-visual" aria-hidden="true">
-          <svg class="ring" viewBox="0 0 400 400">
-            <defs><path id="ring-path" d="M200 200m-186 0a186 186 0 1 1 372 0a186 186 0 1 1-372 0" /></defs>
-            <text><textPath href="#ring-path" textLength="1160" lengthAdjust="spacing">Pizzas au feu de bois · La Maison de la Pizza · Pizzas au feu de bois · La Maison de la Pizza ·</textPath></text>
-          </svg>
-          <div class="hero-pizza">
+          <div class="pizza-wrap">
+            <div class="pizza-spin">
+              <svg class="pizza" id="pizza" viewBox="-310 -310 620 620"></svg>
+            </div>
             <svg class="steam" viewBox="0 0 200 260">
               <path d="M60 250c-20-40 30-60 10-100s20-60 0-100" />
               <path d="M100 250c-20-40 30-60 10-100s20-60 0-100" />
               <path d="M140 250c-20-40 30-60 10-100s20-60 0-100" />
             </svg>
-            <svg class="pizza" id="pizza" viewBox="-310 -310 620 620"></svg>
           </div>
-          <!-- quelques ingrédients posés autour, comme sur une table -->
-          <svg class="deco deco-basil" viewBox="-40 -40 80 80"><path d="M0 -32C18 -22 20 10 0 34C-20 10 -18 -22 0 -32Z" fill="#3e8a3f" /><path d="M0 -27V29" stroke="#1d4f22" stroke-width="1.6" /></svg>
-          <svg class="deco deco-tomato" viewBox="-20 -20 40 40"><circle r="17" fill="#d9261a" /><circle r="12" fill="#f0603f" /><circle r="4" fill="#ff8a6a" /></svg>
-          <svg class="deco deco-basil-2" viewBox="-40 -40 80 80"><path d="M0 -32C18 -22 20 10 0 34C-20 10 -18 -22 0 -32Z" fill="#4f9a49" /><path d="M0 -27V29" stroke="#1d4f22" stroke-width="1.6" /></svg>
-        </div>
-      </section>
 
-      <!-- Trois points forts -->
-      <ul class="perks">
-        <li class="reveal" style="--d: 0s">
-          <svg class="icon" aria-hidden="true"><use href="#i-flame" /></svg>
-          <span><strong>Cuites au feu de bois</strong>Dans le four du camion</span>
-        </li>
-        <li class="reveal" style="--d: 0.12s">
-          <svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg>
-          <span><strong>Commande par téléphone</strong>Elle vous attend au camion</span>
-        </li>
-        <li class="reveal" style="--d: 0.24s">
-          <svg class="icon" aria-hidden="true"><use href="#i-truck" /></svg>
-          <span><strong>5 villes, 5 soirs</strong>Du mercredi au dimanche</span>
-        </li>
-      </ul>
-
-      <!-- =========================
-           LA CARTE
-      ========================== -->
-      <section class="section menu" id="carte">
-        <div class="section-head reveal">
-          <p class="eyebrow">Notre carte</p>
-          <h2>Les pizzas</h2>
-          <p class="ornament" aria-hidden="true"><span></span>✦<span></span></p>
-          <p class="section-intro">31 recettes · Ingrédient supplémentaire +1 €</p>
+          <div class="badge">
+            <svg viewBox="0 0 200 200">
+              <defs>
+                <path id="badge-circle" d="M100 100m-78 0a78 78 0 1 1 156 0a78 78 0 1 1-156 0" />
+              </defs>
+              <text>
+                <textPath href="#badge-circle" textLength="486" lengthAdjust="spacing">FEU DE BOIS ✦ CAMION PIZZA ✦ FEU DE BOIS ✦ CAMION PIZZA ✦</textPath>
+              </text>
+            </svg>
+            <span class="badge-core">
+              <svg viewBox="0 0 40 52"><path d="M20 2c3 9 14 15 14 29a14 14 0 0 1-28 0c0-7 4-11 6-15 1 5 3 7 5 7-1-8 0-15 3-21Z" /></svg>
+            </span>
+          </div>
         </div>
 
-        <nav class="jump reveal" aria-label="Catégories">
-          <a href="#tomate">Base tomate</a>
-          <a href="#creme">Base crème</a>
-          <a href="#pecheurs">Pêcheurs</a>
-        </nav>
+        <div class="hero-content">
+          <h1 class="sr-only">Camion Pizza — La Maison de la Pizza, pizzas artisanales au feu de bois</h1>
+          <p class="eyebrow hero-eyebrow"><span class="spark"></span>Camion pizza · Feu de bois</p>
 
-        <!-- Les pizzas sont générées par script.js -->
-        <div id="pizza-menu" class="menu-card"></div>
+          <!-- Emplacement du jour : c'est la première chose qu'on voit -->
+          <div class="today" id="today" aria-live="polite">
+            <p class="today-badge"><span class="today-pulse" aria-hidden="true"></span><span id="today-kicker">Du mercredi au dimanche</span></p>
+            <p class="hero-town" id="today-location">La tournée</p>
+            <p class="today-hours" id="today-hours"></p>
+          </div>
 
-        <a href="documents/carte-pizzas.pdf" download="Carte-Camion-Pizza.pdf" class="button button-line">
-          <svg class="icon" aria-hidden="true"><use href="#i-down" /></svg>
-          <span>Télécharger la carte (PDF)</span>
+          <div class="hero-actions">
+            <a class="btn btn-cream magnetic" id="today-map" href="#tournee" target="_blank" rel="noopener">
+              <span class="btn-inner">Itinéraire <svg class="icon"><use href="#i-arrow" /></svg></span>
+            </a>
+            <a href="tel:+33786966498" class="btn btn-fire magnetic">
+              <span class="btn-inner">
+                <svg class="icon"><use href="#i-phone" /></svg>
+                Commander <span class="btn-sub">07 86 96 64 98</span>
+              </span>
+            </a>
+            <a href="#carte" class="btn btn-ghost magnetic">
+              <span class="btn-inner">Voir la carte <svg class="icon"><use href="#i-down" /></svg></span>
+            </a>
+          </div>
+        </div>
+
+        <a href="#carte" class="scroll-hint" aria-label="Aller à la carte">
+          <span>La carte</span>
+          <i></i>
         </a>
       </section>
 
-      <!-- Bandeau défilant -->
-      <div class="band" aria-hidden="true">
-        <div class="band-track">
-          <span>Feu de bois</span><b>✦</b><span>Pizzas artisanales</span><b>✦</b><span>Du mercredi au dimanche</span><b>✦</b><span>07 86 96 64 98</span><b>✦</b>
-          <span>Feu de bois</span><b>✦</b><span>Pizzas artisanales</span><b>✦</b><span>Du mercredi au dimanche</span><b>✦</b><span>07 86 96 64 98</span><b>✦</b>
+      <!-- =========================
+           CARTE DES PIZZAS
+      ========================== -->
+      <section id="carte" class="menu" data-light>
+        <div class="menu-blob" aria-hidden="true"></div>
+
+        <div class="menu-head">
+          <div>
+            <p class="section-label"><span>(01)</span> La carte</p>
+            <h2 class="menu-title">
+              <span class="line" data-split>NOTRE</span>
+              <span class="line" data-split>CARTE</span>
+            </h2>
+          </div>
+
+          <div class="menu-aside">
+            <p>
+              <em>Pizzas au feu de bois</em><br />
+              Ingrédient supplémentaire <strong>+1 €</strong>
+            </p>
+            <a
+              href="documents/carte-pizzas.pdf"
+              download="Carte-Camion-Pizza.pdf"
+              class="download magnetic"
+             
+            >
+              <span>Télécharger la carte</span>
+              <svg class="icon"><use href="#i-down" /></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Catégories de pizzas">
+          <span class="tabs-indicator" aria-hidden="true"></span>
+          <button class="tab is-active" role="tab" aria-selected="true" aria-controls="pizza-menu" data-category="tomate">
+            Base tomate <sup>21</sup>
+          </button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="pizza-menu" data-category="creme">
+            Base crème <sup>6</sup>
+          </button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="pizza-menu" data-category="pecheurs">
+            Pêcheurs <sup>4</sup>
+          </button>
+        </div>
+
+        <!-- Les pizzas sont générées par script.js -->
+        <ul id="pizza-menu" class="pizza-list" role="tabpanel" aria-live="polite"></ul>
+      </section>
+
+      <!-- =========================
+           LA TOURNÉE
+      ========================== -->
+      <section id="tournee" class="tour">
+        <div class="tour-head">
+          <p class="section-label"><span>(02)</span> La tournée</p>
+          <h2 class="tour-title">
+            <span class="line" data-split>OÙ NOUS</span>
+            <span class="line" data-split>TROUVER&nbsp;?</span>
+          </h2>
+          <p class="tour-intro">
+            Cinq soirs, cinq villes. Lundi et mardi, le four se repose.
+          </p>
+        </div>
+
+        <div class="road-wrap" aria-hidden="true">
+          <svg class="road" viewBox="0 -40 1200 230" id="road-svg">
+            <defs>
+              <linearGradient id="trail-gradient" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#e31e24" />
+                <stop offset=".6" stop-color="#ff6a1a" />
+                <stop offset="1" stop-color="#ffb02e" />
+              </linearGradient>
+            </defs>
+            <path class="road-edge" d="M-40 100 C 40 150, 60 150, 120 150 S 280 70, 360 70 S 520 150, 600 150 S 760 70, 840 70 S 1000 150, 1080 150 S 1200 110, 1240 100" />
+            <path id="road" class="road-base" d="M-40 100 C 40 150, 60 150, 120 150 S 280 70, 360 70 S 520 150, 600 150 S 760 70, 840 70 S 1000 150, 1080 150 S 1200 110, 1240 100" />
+            <path class="road-line" d="M-40 100 C 40 150, 60 150, 120 150 S 280 70, 360 70 S 520 150, 600 150 S 760 70, 840 70 S 1000 150, 1080 150 S 1200 110, 1240 100" />
+            <path class="road-trail" d="M-40 100 C 40 150, 60 150, 120 150 S 280 70, 360 70 S 520 150, 600 150 S 760 70, 840 70 S 1000 150, 1080 150 S 1200 110, 1240 100" />
+            <g class="road-stops"></g>
+            <g class="truck" id="truck">
+              <g class="truck-body">
+                <ellipse cx="80" cy="96" rx="64" ry="5" fill="#000" opacity=".35" />
+                <g class="truck-smoke">
+                  <circle cx="44" cy="-2" r="5" />
+                  <circle cx="50" cy="-12" r="7" />
+                  <circle cx="44" cy="-26" r="9" />
+                </g>
+                <rect x="40" y="2" width="8" height="18" rx="2" fill="#2b211b" />
+                <rect x="14" y="18" width="104" height="9" rx="4" fill="#f6efe4" />
+                <path d="M10 30a8 8 0 0 1 8-8h96l10 0c8 0 14 6 16 12l8 22v20a8 8 0 0 1-8 8H18a8 8 0 0 1-8-8Z" fill="#e31e24" />
+                <path d="M124 30h6c4 0 7 3 8 6l5 16h-19Z" fill="#cfe9f5" />
+                <rect x="24" y="34" width="72" height="28" rx="3" fill="#1e1511" />
+                <circle cx="60" cy="60" r="14" fill="#ff7a1a" opacity=".85" />
+                <circle cx="60" cy="60" r="7" fill="#ffd27a" />
+                <g class="awning">
+                  <rect x="20" y="28" width="80" height="9" fill="#f6efe4" />
+                  <rect x="20" y="28" width="10" height="9" fill="#b51f24" />
+                  <rect x="40" y="28" width="10" height="9" fill="#b51f24" />
+                  <rect x="60" y="28" width="10" height="9" fill="#b51f24" />
+                  <rect x="80" y="28" width="10" height="9" fill="#b51f24" />
+                </g>
+                <text x="60" y="78" text-anchor="middle" class="truck-text">PIZZA</text>
+                <rect x="140" y="64" width="8" height="5" rx="2" fill="#ffd27a" />
+                <g class="wheel" transform="translate(38 86)">
+                  <circle r="12" fill="#17110e" />
+                  <circle r="5.5" fill="#8d8178" />
+                  <path d="M0 -10V10M-10 0H10" stroke="#3a2f29" stroke-width="2" />
+                </g>
+                <g class="wheel" transform="translate(118 86)">
+                  <circle r="12" fill="#17110e" />
+                  <circle r="5.5" fill="#8d8178" />
+                  <path d="M0 -10V10M-10 0H10" stroke="#3a2f29" stroke-width="2" />
+                </g>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <ol class="stops" id="stops"></ol>
+      </section>
+
+      <!-- =========================
+           BANDEAU DÉFILANT
+      ========================== -->
+      <div class="marquees" aria-hidden="true">
+        <div class="marquee marquee-red" data-marquee="1">
+          <div class="marquee-track">
+            <span>Feu de bois</span><b>✦</b><span>Pizzas artisanales</span><b>✦</b><span>Mercredi → Dimanche</span><b>✦</b><span>Commande par téléphone</span><b>✦</b>
+          </div>
         </div>
       </div>
 
       <!-- =========================
-           OÙ NOUS TROUVER
+           L'ESPRIT
       ========================== -->
-      <section class="section tour" id="tournee">
-        <div class="section-head reveal">
-          <p class="eyebrow">La tournée</p>
-          <h2>Où nous trouver ?</h2>
-          <p class="ornament" aria-hidden="true"><span></span>✦<span></span></p>
-          <p class="section-intro">Du mercredi au dimanche · Fermé le lundi et le mardi</p>
-        </div>
-        <div class="road reveal" aria-hidden="true">
-          <span class="road-line"></span>
-          <svg class="road-truck"><use href="#i-truck" /></svg>
-        </div>
-        <ul class="week reveal" id="week"></ul>
+      <section id="esprit" class="manifesto">
+        <p class="section-label"><span>(03)</span> L'esprit</p>
+        <p class="manifesto-text" data-words>
+          Un camion, un <em>feu de bois</em> et des pizzas généreuses. Du mercredi au dimanche, on
+          s'installe <em>près de chez vous</em>&nbsp;: vous appelez, on enfourne, vous savourez.
+        </p>
+
+        <ul class="stats">
+          <li>
+            <strong><span data-count="31">31</span></strong>
+            <span>pizzas à la carte</span>
+          </li>
+          <li>
+            <strong><span data-count="5">5</span></strong>
+            <span>soirs par semaine</span>
+          </li>
+          <li>
+            <strong><small>dès</small><span data-count="8.5" data-decimals="2">8,50</span><small>€</small></strong>
+            <span>la Margherita</span>
+          </li>
+          <li>
+            <strong><small>+</small><span data-count="1">1</span><small>€</small></strong>
+            <span>l'ingrédient en plus</span>
+          </li>
+        </ul>
       </section>
 
       <!-- =========================
-           COMMANDER
+           CONTACT
       ========================== -->
-      <section class="order">
-        <p class="eyebrow reveal">On vous attend</p>
-        <h2 class="reveal">Une pizza <em class="fire">ce soir ?</em></h2>
-        <p class="order-text reveal">Appelez-nous, on vous la prépare au feu de bois.</p>
-        <a href="tel:+33786966498" class="order-phone reveal">
-          <svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg> 07 86 96 64 98
+      <section id="contact" class="cta">
+        <div class="cta-fire" aria-hidden="true"></div>
+
+        <p class="section-label"><span>(04)</span> Commander</p>
+        <h2 class="cta-title">
+          <span class="line" data-split>UNE PIZZA</span>
+          <span class="line line-fire" data-split>CE SOIR&nbsp;?</span>
+        </h2>
+        <p class="cta-text">Appelez-nous, on vous la prépare au feu de bois.</p>
+
+        <a href="tel:+33786966498" class="call magnetic" aria-label="Appeler le 07 86 96 64 98">
+          <svg class="call-ring" viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <path id="call-circle" d="M100 100m-82 0a82 82 0 1 1 164 0a82 82 0 1 1-164 0" />
+            </defs>
+            <text>
+              <textPath href="#call-circle" textLength="512" lengthAdjust="spacing">APPELER ✦ 07 86 96 64 98 ✦ APPELER ✦ 07 86 96 64 98 ✦</textPath>
+            </text>
+          </svg>
+          <span class="call-core"><svg class="icon"><use href="#i-phone" /></svg></span>
         </a>
+
+        <a href="tel:+33786966498" class="cta-phone">07&nbsp;86&nbsp;96&nbsp;64&nbsp;98</a>
       </section>
     </main>
 
+    <!-- =========================
+         FOOTER
+    ========================== -->
     <footer class="footer">
-      <img src="image/logo.png" alt="La Maison de la Pizza" width="96" height="91" loading="lazy" />
-      <p class="footer-line">Le camion pizza de La Maison de la Pizza</p>
-      <a href="tel:+33786966498" class="footer-phone">07 86 96 64 98</a>
-      <p class="footer-copy">© 2026 La Maison de la Pizza · Tous droits réservés</p>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#accueil"><img src="image/logo.png" alt="La Maison de la Pizza" width="120" height="114" loading="lazy" /></a>
+          <p>Le camion pizza de La Maison de la Pizza.<br />Pizzas artisanales au feu de bois.</p>
+        </div>
+
+        <div>
+          <p class="footer-title">Navigation</p>
+          <ul class="footer-links">
+            <li><a href="#accueil" class="roll"><span data-text="Accueil">Accueil</span></a></li>
+            <li><a href="#carte" class="roll"><span data-text="La carte">La carte</span></a></li>
+            <li><a href="#tournee" class="roll"><span data-text="La tournée">La tournée</span></a></li>
+            <li><a href="documents/carte-pizzas.pdf" download="Carte-Camion-Pizza.pdf" class="roll"><span data-text="Carte PDF">Carte PDF</span></a></li>
+          </ul>
+        </div>
+
+        <div>
+          <p class="footer-title">La tournée</p>
+          <ul class="footer-week" id="footer-week"></ul>
+        </div>
+
+        <div>
+          <p class="footer-title">Commandes</p>
+          <a href="tel:+33786966498" class="footer-phone">07 86 96 64 98</a>
+          <p class="footer-note">Appelez, on prépare, vous récupérez au camion.</p>
+        </div>
+      </div>
+
+      <p class="footer-giant" aria-hidden="true" data-split>LA MAISON DE LA PIZZA</p>
+
+      <div class="footer-bottom">
+        <p>© 2026 La Maison de la Pizza · Tous droits réservés</p>
+        <a href="#accueil" class="to-top">Retour en haut <svg class="icon"><use href="#i-arrow" /></svg></a>
+      </div>
     </footer>
 
-    <!-- Barre d'appel toujours visible sur téléphone -->
-    <a href="tel:+33786966498" class="call-bar">
-      <svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg> Appeler le 07 86 96 64 98
+    <!-- Bouton d'appel flottant (mobile) -->
+    <a href="tel:+33786966498" class="float-call" aria-label="Appeler le 07 86 96 64 98">
+      <svg class="icon"><use href="#i-phone" /></svg>
     </a>
 
+    <script src="vendor/gsap.min.js"></script>
+    <script src="vendor/ScrollTrigger.min.js"></script>
+    <script src="vendor/lenis.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

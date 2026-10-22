@@ -1,18 +1,36 @@
 // =========================
-// CAMION PIZZA — version simple
+// CAMION PIZZA — La Maison de la Pizza
 // =========================
 
 (() => {
   "use strict";
 
-  const $ = (s) => document.querySelector(s);
+  const $ = (s, c = document) => c.querySelector(s);
+  const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+  const NS = "http://www.w3.org/2000/svg";
+  const root = document.documentElement;
+
+  const reduced = root.classList.contains("reduced");
+  const hasGsap = !!(window.gsap && window.ScrollTrigger);
+  const motion = hasGsap && !reduced;
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
   const f = (v) => Math.round(v * 10) / 10;
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const debounce = (fn, ms) => {
+    let t;
+    return (...a) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...a), ms);
+    };
+  };
 
   // =========================
   // LA TOURNÉE
-  // spot : où se gare le camion · map : adresse ouverte par le bouton Itinéraire
   // =========================
 
+  // spot : où se gare le camion (non affiché, lu par les lecteurs d'écran)
+  // map : adresse ouverte par le bouton Itinéraire
   const schedule = [
     {
       day: 3,
@@ -64,7 +82,6 @@
   const hoursOf = (s) => `${s.open}h – ${s.close}h`;
   const mapUrl = (s) => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(s.map);
 
-  // Où est le camion maintenant, ce soir, ou au prochain passage
   function getStatus(now = new Date()) {
     const d = now.getDay();
     const h = now.getHours() + now.getMinutes() / 60;
@@ -72,68 +89,113 @@
 
     if (today && h < today.close) {
       if (h >= today.open) {
-        return { state: "open", stop: today, label: "Le camion est ouvert", hours: `Jusqu’à ${today.close}h` };
+        return {
+          state: "open",
+          stop: today,
+          kicker: "En ce moment",
+          place: today.town,
+          detail: `Jusqu'à ${today.close}h`,
+          badge: "En ce moment",
+          short: `Ouvert maintenant à ${today.town}, jusqu'à ${today.close}h`,
+        };
       }
-      return { state: "tonight", stop: today, label: "Ce soir", hours: hoursOf(today) };
+      return {
+        state: "tonight",
+        stop: today,
+        kicker: "Ce soir",
+        place: today.town,
+        detail: hoursOf(today),
+        badge: "Ce soir",
+        short: `Ce soir à ${today.town} · ${hoursOf(today)}`,
+      };
     }
+
     for (let i = 1; i <= 7; i++) {
       const s = schedule.find((x) => x.day === (d + i) % 7);
-      if (s) {
-        const label = i === 1 ? "Demain soir" : `Prochain passage : ${s.name.toLowerCase()}`;
-        return { state: "next", stop: s, label, hours: hoursOf(s) };
-      }
+      if (!s) continue;
+      const kicker = i === 1 ? "Demain soir" : `Prochain passage · ${s.name}`;
+      return {
+        state: "next",
+        stop: s,
+        kicker,
+        place: s.town,
+        detail: hoursOf(s),
+        badge: i === 1 ? "Demain" : "Prochain arrêt",
+        short: `${kicker} : ${s.town} · ${hoursOf(s)}`,
+      };
     }
   }
 
-  // Nom de la ville découpé en lettres pour l'animation d'entrée
-  // (passage à la ligne possible après chaque tiret, nom lu en entier par les lecteurs d'écran)
-  function renderTown(town) {
-    const el = $("#today-location");
-    if (el.dataset.town === town) return;
-    el.dataset.town = town;
-    let i = 0;
-    const parts = town.split("-");
-    const letters = parts
-      .map((part, j) => {
-        const seg = j < parts.length - 1 ? part + "-" : part;
-        const chars = [...seg].map((c) => `<span class="ch" style="--i:${i++}">${c}</span>`).join("");
-        return `<span class="seg">${chars}</span>`;
-      })
-      .join("​");
-    el.innerHTML = `<span class="sr-only">${town}</span><span aria-hidden="true">${letters}</span>`;
-    el.classList.add("is-split");
+  let status = getStatus();
+
+  function renderStatus() {
+    status = getStatus();
+    const box = $(".today");
+    box.classList.remove("is-open", "is-tonight", "is-next");
+    box.classList.add(`is-${status.state}`);
+    $("#today-kicker").textContent = status.kicker;
+    renderTown(status.place);
+    $("#today-hours").textContent = status.detail;
+    const map = $("#today-map");
+    map.href = mapUrl(status.stop);
+    map.setAttribute("aria-label", `Itinéraire vers ${status.stop.town}, ${status.stop.spot}`);
+    const short = $("[data-status-short]");
+    if (short) short.textContent = status.short;
   }
 
-  function render() {
-    const st = getStatus();
-    const box = $(".today");
-    box.classList.toggle("is-open", st.state === "open");
-    $("#today-kicker").textContent = st.label;
-    renderTown(st.stop.town);
-    $("#today-hours").textContent = st.hours;
-    const map = $("#today-map");
-    map.href = mapUrl(st.stop);
-    map.setAttribute("aria-label", `Itinéraire vers ${st.stop.town}`);
+  // Nom de la ville en très grand, lettre par lettre (annoncé en entier aux lecteurs d'écran)
+  const townEl = $("#today-location");
 
-    $("#week").innerHTML = schedule
-      .map((s) => {
-        const hot = s === st.stop;
-        const tag = hot ? (st.state === "next" ? "Prochain" : "Aujourd’hui") : "";
-        return `
-        <li class="day${hot ? " is-today" : ""}">
-          <p class="day-name">${s.name}${tag ? ` <strong>${tag}</strong>` : ""}</p>
-          <p class="day-town">${s.town}</p>
-          <p class="day-hours">${hoursOf(s)}</p>
-          <a class="day-map" href="${mapUrl(s)}" target="_blank" rel="noopener" aria-label="Itinéraire vers ${s.town}">
-            <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg> Itinéraire
+  function renderTown(town) {
+    if (townEl.dataset.town === town) return;
+    townEl.dataset.town = town;
+    townEl.innerHTML = `<span class="sr-only"></span><span aria-hidden="true"></span>`;
+    townEl.firstChild.textContent = town;
+    townEl.lastChild.textContent = town;
+    splitChars(townEl.lastChild);
+    fitTown();
+  }
+
+  // Réduit la taille jusqu'à tenir sur 2 lignes maximum, sans déborder ;
+  // un nom sur 2 lignes est un peu plus petit pour garder l'accueil équilibré
+  function fitTown() {
+    townEl.style.fontSize = "";
+    const base = parseFloat(getComputedStyle(townEl).fontSize);
+    const linesAt = (s) => Math.round(townEl.offsetHeight / (s * 0.9));
+    let size = base;
+    for (let i = 0; i < 30; i++) {
+      if (townEl.scrollWidth <= townEl.clientWidth + 1 && linesAt(size) <= 2) break;
+      size *= 0.94;
+      townEl.style.fontSize = `${f(size)}px`;
+    }
+    if (linesAt(size) > 1 && size > base * 0.7) townEl.style.fontSize = `${f(base * 0.7)}px`;
+  }
+
+  function renderStops() {
+    $("#stops").innerHTML =
+      schedule
+        .map((s) => {
+          const hot = s === status.stop;
+          return `
+        <li class="stop${hot ? " is-today" : ""}">
+          ${hot ? `<span class="stop-badge">${status.badge}</span>` : ""}
+          <p class="stop-day">${s.name}</p>
+          <h3 class="stop-town">${s.town}</h3>
+          <p class="stop-hours">${hoursOf(s)}</p>
+          <a class="stop-map" href="${mapUrl(s)}" target="_blank" rel="noopener" aria-label="Itinéraire vers ${s.town}, ${s.spot}">
+            Itinéraire <svg class="icon"><use href="#i-arrow" /></svg>
           </a>
         </li>`;
-      })
+        })
+        .join("") + `<li class="stops-fill" role="presentation" aria-hidden="true"></li>`;
+
+    $("#footer-week").innerHTML = schedule
+      .map((s) => `<li${s === status.stop ? ' class="is-today"' : ""}><span>${s.name}</span><b>${s.town}</b></li>`)
       .join("");
   }
 
   // =========================
-  // LA CARTE
+  // CARTE DES PIZZAS
   // =========================
 
   const pizzas = {
@@ -229,35 +291,89 @@
     ],
   };
 
-  const titles = { tomate: "Base tomate", creme: "Base crème", pecheurs: "Pêcheurs" };
+  const catColor = { tomate: "#e31e24", creme: "#1797cf", pecheurs: "#0b5a92" };
   const meat = /jambon|poulet|merguez|lardons|viande|chorizo|saumon|thon|anchois/i;
 
-  $("#pizza-menu").innerHTML = Object.entries(pizzas)
-    .map(
-      ([cat, list]) => `
-      <section class="category category-${cat} reveal" id="${cat}">
-        <header class="category-head">
-          <h3>${titles[cat]}</h3>
-          <span>${list.length} pizzas</span>
-        </header>
-        <ul class="dishes">
-          ${list
-            .map(
-              (p, i) => `
-            <li class="dish" style="--i:${Math.min(i, 12)}">
-              <div class="dish-top">
-                <span class="dish-name">${p.name}</span>
-                ${meat.test(p.ingredients) ? "" : '<span class="veg">Veggie</span>'}
-                <span class="dish-price">${p.price}</span>
-              </div>
-              <p class="dish-ing">${p.ingredients}</p>
-            </li>`
-            )
-            .join("")}
-        </ul>
-      </section>`
-    )
-    .join("");
+  const list = $("#pizza-menu");
+  const tabsEl = $(".tabs");
+  const tabs = $$(".tab");
+  const indicator = $(".tabs-indicator");
+  const menuBlob = $(".menu-blob");
+  let current = "tomate";
+
+  function renderMenu(cat) {
+    const items = pizzas[cat];
+    const rows = Math.ceil(items.length / 2);
+    list.dataset.cat = cat;
+    list.style.setProperty("--rows", rows);
+    list.innerHTML = items
+      .map(
+        (p, i) => `
+      <li class="dish${i === 0 || i === rows ? " col-top" : ""}">
+        <div class="dish-top">
+          <h3 class="dish-name">${p.name}</h3>
+          ${meat.test(p.ingredients) ? "" : '<span class="veg"><svg class="icon"><use href="#i-leaf" /></svg>Veggie</span>'}
+          <span class="dish-dots" aria-hidden="true"></span>
+          <span class="dish-price">${p.price}</span>
+        </div>
+        <p class="dish-ing">${p.ingredients}</p>
+      </li>`
+      )
+      .join("");
+  }
+
+  function moveIndicator() {
+    const t = tabs.find((x) => x.dataset.category === current);
+    indicator.style.width = t.offsetWidth + "px";
+    indicator.style.transform = `translateX(${t.offsetLeft}px)`;
+    indicator.style.backgroundColor = catColor[current];
+  }
+
+  function selectTab(tab, focus) {
+    const cat = tab.dataset.category;
+    if (focus) tab.focus();
+    if (cat === current) return;
+    current = cat;
+
+    tabs.forEach((t) => {
+      const on = t === tab;
+      t.classList.toggle("is-active", on);
+      t.setAttribute("aria-selected", on);
+      t.tabIndex = on ? 0 : -1;
+    });
+    moveIndicator();
+    menuBlob.style.backgroundColor = catColor[cat];
+
+    if (!motion) {
+      renderMenu(cat);
+      return;
+    }
+
+    gsap.to(list.children, {
+      y: -14,
+      opacity: 0,
+      duration: 0.22,
+      stagger: 0.008,
+      ease: "power2.in",
+      overwrite: true,
+      onComplete: () => {
+        renderMenu(cat);
+        gsap.from(list.children, { y: 30, opacity: 0, duration: 0.8, stagger: 0.03, ease: "expo.out" });
+        ScrollTrigger.refresh();
+      },
+    });
+  }
+
+  tabs.forEach((t, i) => {
+    t.tabIndex = t.classList.contains("is-active") ? 0 : -1;
+    t.addEventListener("click", () => selectTab(t));
+    t.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      e.preventDefault();
+      const step = e.key === "ArrowRight" ? 1 : tabs.length - 1;
+      selectTab(tabs[(i + step) % tabs.length], true);
+    });
+  });
 
   // =========================
   // PIZZA (SVG généré)
@@ -288,8 +404,7 @@
     return d + "Z";
   }
 
-  // Pizza détaillée sur planche en bois. Chaque garniture est dans un groupe .top
-  // pour pouvoir « tomber » sur la pizza à l'ouverture (voir style.css).
+  // Pizza détaillée sur planche en bois ; une part (#pz-cut) peut se détacher au scroll
   function buildPizza(svg) {
     const rand = rng(11);
     const R = (a, b) => a + rand() * (b - a);
@@ -321,18 +436,19 @@
 
     let i = 0; // ordre d'apparition des garnitures
     let art = "";
+    let board = "";
 
     // Planche en bois
-    art += `<circle r="306" fill="url(#pz-board)"/>`;
+    board += `<circle r="306" fill="url(#pz-board)"/>`;
     for (let k = 0; k < 16; k++) {
       const r = 284 + k * 1.4;
-      art += `<ellipse rx="${f(r)}" ry="${f(r * R(0.97, 1))}" transform="rotate(${f(R(0, 180))})" fill="none" stroke="#3a2210" stroke-opacity="${f(R(0.08, 0.2))}" stroke-width="${f(R(0.6, 1.6))}"/>`;
+      board += `<ellipse rx="${f(r)}" ry="${f(r * R(0.97, 1))}" transform="rotate(${f(R(0, 180))})" fill="none" stroke="#3a2210" stroke-opacity="${f(R(0.08, 0.2))}" stroke-width="${f(R(0.6, 1.6))}"/>`;
     }
-    art += `<circle r="304" fill="none" stroke="#2c190b" stroke-opacity=".5" stroke-width="4"/>`;
+    board += `<circle r="304" fill="none" stroke="#2c190b" stroke-opacity=".5" stroke-width="4"/>`;
     // farine sur la planche
     for (let k = 0; k < 70; k++) {
       const [x, y] = polar(R(272, 300), R(0, TAU));
-      art += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(R(0.6, 1.8))}" fill="#f4e6cc" opacity="${f(R(0.25, 0.6))}"/>`;
+      board += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(R(0.6, 1.8))}" fill="#f4e6cc" opacity="${f(R(0.25, 0.6))}"/>`;
     }
 
     // Croûte
@@ -345,16 +461,16 @@
       const w = R(10, 22);
       const rot = f(deg(a) + 90);
       art += `<g transform="translate(${f(x)} ${f(y)}) rotate(${rot})">
-        <ellipse rx="${f(w)}" ry="${f(w * 0.45)}" fill="#f5cf8e" opacity=".55"/>
-        <ellipse rx="${f(w * 0.45)}" ry="${f(w * 0.16)}" cy="${f(-w * 0.26)}" fill="url(#pz-char)" opacity=".7"/>
+        <ellipse rx="${f(w)}" ry="${f(w * 0.5)}" fill="#f5cf8e" opacity=".75"/>
+        <ellipse rx="${f(w * 0.55)}" ry="${f(w * 0.28)}" cy="${f(-w * 0.08)}" fill="url(#pz-char)"/>
       </g>`;
     }
     // marques du feu de bois
     for (let k = 0; k < 46; k++) {
       const a = R(0, TAU);
-      const [x, y] = polar(R(246, 268), a);
-      const s = R(2.5, 8);
-      art += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(s)}" ry="${f(s * R(0.35, 0.6))}" opacity="${f(R(0.5, 0.85))}" transform="rotate(${f(deg(a) + 90)} ${f(x)} ${f(y)})" fill="url(#pz-char)"/>`;
+      const [x, y] = polar(R(236, 268), a);
+      const s = R(3, 11);
+      art += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(s)}" ry="${f(s * R(0.4, 0.8))}" transform="rotate(${f(deg(a) + 90)} ${f(x)} ${f(y)})" fill="url(#pz-char)"/>`;
     }
     // ombre au bord de la sauce
     art += `<circle r="234" fill="none" stroke="#5a2a0e" stroke-opacity=".45" stroke-width="12"/>`;
@@ -458,6 +574,15 @@
       art += `<line x1="0" y1="0" x2="${f(x)}" y2="${f(y)}" stroke="#3d0f06" stroke-opacity=".3" stroke-width="2.4" stroke-linecap="round"/>`;
     }
 
+    const rad = (d) => (d * Math.PI) / 180;
+    const wedge = (r, from = 112.5, to = 157.5) => {
+      const a0 = rad(from);
+      const a1 = rad(to);
+      return `M0 0L${f(Math.cos(a0) * r)} ${f(Math.sin(a0) * r)}A${r} ${r} 0 0 1 ${f(Math.cos(a1) * r)} ${f(
+        Math.sin(a1) * r
+      )}Z`;
+    };
+
     svg.innerHTML = `
       <defs>
         <radialGradient id="pz-board" cx="0" cy="0" r="306" gradientUnits="userSpaceOnUse">
@@ -490,99 +615,672 @@
         <radialGradient id="pz-olive" cx=".35" cy=".35" r=".75">
           <stop offset="0" stop-color="#55493f"/><stop offset="1" stop-color="#120f0d"/>
         </radialGradient>
+        <g id="pz-art">${art}</g>
+        <clipPath id="pz-rest"><path clip-rule="evenodd" d="M-340 -340H340V340H-340Z${wedge(300, 113.2, 156.8)}"/></clipPath>
+        <clipPath id="pz-cut"><path d="${wedge(300)}"/></clipPath>
       </defs>
-      ${art}`;
+      ${board}
+      <use href="#pz-art" clip-path="url(#pz-rest)"/>
+      <g class="pz-slice">
+        <path class="pz-slice-shadow" d="${wedge(270)}" fill="#000" opacity="0" transform="translate(5 12)"/>
+        <use href="#pz-art" clip-path="url(#pz-cut)"/>
+      </g>`;
   }
 
   // =========================
-  // APPARITIONS DOUCES AU SCROLL
+  // BRAISES (canvas)
   // =========================
 
-  function initReveal() {
-    const items = document.querySelectorAll(".reveal");
-    if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      items.forEach((el) => el.classList.add("is-in"));
-      return;
+  class Embers {
+    constructor(canvas, opts = {}) {
+      this.c = canvas;
+      this.ctx = canvas.getContext("2d");
+      this.density = opts.density || 1;
+      this.parts = [];
+      this.running = false;
+      this.visible = false;
+      this.mx = null;
+      this.sprite = Embers.sprite();
+      this.loop = this.loop.bind(this);
+
+      this.resize();
+      new ResizeObserver(() => this.resize()).observe(canvas);
+      new IntersectionObserver(([e]) => {
+        this.visible = e.isIntersecting;
+        this.toggle();
+      }).observe(canvas);
+      document.addEventListener("visibilitychange", () => this.toggle());
+
+      if (opts.interactive) {
+        const host = canvas.parentElement;
+        host.addEventListener("pointermove", (e) => {
+          const r = canvas.getBoundingClientRect();
+          this.mx = e.clientX - r.left;
+          this.my = e.clientY - r.top;
+        });
+        host.addEventListener("pointerleave", () => (this.mx = null));
+      }
     }
-    const io = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-in");
-            io.unobserve(e.target);
+
+    static sprite() {
+      if (Embers.cache) return Embers.cache;
+      const s = document.createElement("canvas");
+      s.width = s.height = 64;
+      const g = s.getContext("2d");
+      const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gr.addColorStop(0, "rgba(255,244,214,1)");
+      gr.addColorStop(0.18, "rgba(255,190,90,.95)");
+      gr.addColorStop(0.42, "rgba(255,106,26,.42)");
+      gr.addColorStop(1, "rgba(227,30,36,0)");
+      g.fillStyle = gr;
+      g.fillRect(0, 0, 64, 64);
+      return (Embers.cache = s);
+    }
+
+    resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+      this.w = this.c.clientWidth;
+      this.h = this.c.clientHeight;
+      this.c.width = Math.round(this.w * dpr);
+      this.c.height = Math.round(this.h * dpr);
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const target = Math.round(Math.min(110, Math.max(24, (this.w * this.h) / 15000)) * this.density);
+      while (this.parts.length < target) this.parts.push(this.spawn({}, true));
+      this.parts.length = target;
+    }
+
+    spawn(p, initial) {
+      p.x = Math.random() * this.w;
+      p.y = initial ? Math.random() * this.h : this.h + 10 + Math.random() * 40;
+      p.vx = (Math.random() - 0.5) * 0.25;
+      p.vy = -(0.35 + Math.random() * 1.1);
+      p.s = 4 + Math.random() * Math.random() * 15;
+      p.life = initial ? Math.random() : 0;
+      p.speed = 0.0025 + Math.random() * 0.004;
+      p.ph = Math.random() * 6.28;
+      p.fl = 2 + Math.random() * 6;
+      return p;
+    }
+
+    toggle() {
+      const on = this.visible && !document.hidden;
+      if (on && !this.running) {
+        this.running = true;
+        this.last = performance.now();
+        requestAnimationFrame(this.loop);
+      } else if (!on) {
+        this.running = false;
+      }
+    }
+
+    loop(t) {
+      if (!this.running) return;
+      const dt = Math.min((t - this.last) / 16.67, 3);
+      this.last = t;
+      this.frame(dt);
+      requestAnimationFrame(this.loop);
+    }
+
+    frame(dt) {
+      const ctx = this.ctx;
+      ctx.clearRect(0, 0, this.w, this.h);
+      ctx.globalCompositeOperation = "lighter";
+
+      for (const p of this.parts) {
+        p.life += p.speed * dt;
+        if (p.life >= 1 || p.y < -20) this.spawn(p, false);
+        p.ph += 0.03 * dt;
+
+        let vx = p.vx + Math.sin(p.ph) * 0.25;
+        if (this.mx !== null) {
+          const dx = p.x - this.mx;
+          const dy = p.y - this.my;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < 18000) {
+            const d = Math.sqrt(d2) + 1;
+            const k = (1 - d2 / 18000) * 2.2;
+            vx += (dx / d) * k;
+            p.y += (dy / d) * k * dt * 0.6;
           }
-        }),
-      { rootMargin: "0px 0px -8% 0px" }
-    );
-    items.forEach((el) => io.observe(el));
+        }
+        p.x += vx * dt;
+        p.y += p.vy * dt;
+
+        const a = Math.sin(Math.PI * p.life) * (0.65 + 0.35 * Math.sin(p.ph * p.fl));
+        if (a <= 0) continue;
+        ctx.globalAlpha = a;
+        ctx.drawImage(this.sprite, p.x - p.s / 2, p.y - p.s / 2, p.s, p.s);
+      }
+      ctx.globalAlpha = 1;
+    }
   }
 
   // =========================
-  // AU SCROLL : la pizza tourne un peu plus, la barre de progression avance
+  // DÉCOUPAGE DU TEXTE
   // =========================
 
-  function initScroll() {
-    const pizza = $(".hero-pizza");
-    const bar = $(".progress");
-    let ticking = false;
-    const update = () => {
-      const y = window.scrollY;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      if (pizza) pizza.style.setProperty("--r", (y * 0.15).toFixed(1));
-      if (bar) bar.style.transform = `scaleX(${max > 0 ? Math.min(y / max, 1) : 0})`;
-      ticking = false;
+  function splitChars(el) {
+    const words = el.textContent.trim().split(/ +/);
+    el.textContent = "";
+    words.forEach((w, i) => {
+      // « Pont-Sainte-Maxence » peut passer à la ligne après chaque tiret
+      const parts = w.split("-");
+      parts.forEach((part, j) => {
+        const word = document.createElement("span");
+        word.className = "word";
+        for (const c of j < parts.length - 1 ? part + "-" : part) {
+          const ch = document.createElement("span");
+          ch.className = "char";
+          ch.textContent = c;
+          word.appendChild(ch);
+        }
+        el.appendChild(word);
+        if (j < parts.length - 1) el.appendChild(document.createTextNode("​"));
+      });
+      if (i < words.length - 1) el.appendChild(document.createTextNode(" "));
+    });
+    el.classList.add("is-split");
+    return $$(".char", el);
+  }
+
+  function splitWords(el) {
+    const walk = (node) => {
+      [...node.childNodes].forEach((n) => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          n.textContent.split(/([ \t\n\r]+)/).forEach((part) => {
+            if (!part) return;
+            if (/^[ \t\n\r]+$/.test(part)) {
+              frag.appendChild(document.createTextNode(" "));
+            } else {
+              const s = document.createElement("span");
+              s.className = "w";
+              s.textContent = part;
+              frag.appendChild(s);
+            }
+          });
+          node.replaceChild(frag, n);
+        } else if (n.nodeType === 1) {
+          walk(n);
+        }
+      });
     };
+    walk(el);
+    return $$(".w", el);
+  }
+
+  // =========================
+  // ROUTE DU CAMION
+  // =========================
+
+  function initRoad() {
+    const path = $("#road");
+    const total = path.getTotalLength();
+    const trail = $(".road-trail");
+    const truck = $("#truck");
+    const wheels = $$(".wheel", truck);
+    const pinsG = $(".road-stops");
+    const cards = $$(".stop");
+
+    // Longueur du tracé au droit de chaque étape (centre des 5 colonnes)
+    const samples = [];
+    for (let i = 0; i <= 600; i++) {
+      const L = (total * i) / 600;
+      samples.push([L, path.getPointAtLength(L).x]);
+    }
+    const lens = [120, 360, 600, 840, 1080].map(
+      (x) => samples.reduce((best, s) => (Math.abs(s[1] - x) < Math.abs(best[1] - x) ? s : best))[0]
+    );
+
+    const pins = lens.map((L) => {
+      const p = path.getPointAtLength(L);
+      const g = document.createElementNS(NS, "g");
+      g.setAttribute("class", "road-pin");
+      g.setAttribute("transform", `translate(${f(p.x)} ${f(p.y)})`);
+      g.innerHTML = `<circle class="pin-pulse" r="13"/><circle class="pin-ring" r="13"/><circle class="pin-core" r="4.5"/>`;
+      pinsG.appendChild(g);
+      return g;
+    });
+
+    trail.style.strokeDasharray = `${total} ${total}`;
+    const endL = lens[lens.length - 1] + 40;
+
+    function set(L) {
+      const a = path.getPointAtLength(L);
+      const b = path.getPointAtLength(Math.min(L + 3, total));
+      const ang = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+      truck.setAttribute(
+        "transform",
+        `translate(${f(a.x)} ${f(a.y)}) rotate(${f(ang)}) scale(.82) translate(-80 -92)`
+      );
+      const spin = f((L / (2 * Math.PI * 12)) * 360);
+      wheels[0].setAttribute("transform", `translate(38 86) rotate(${spin})`);
+      wheels[1].setAttribute("transform", `translate(118 86) rotate(${spin})`);
+      trail.style.strokeDashoffset = f(total - L);
+      lens.forEach((sl, i) => {
+        const on = L >= sl - 4;
+        pins[i].classList.toggle("is-on", on);
+        if (cards[i]) cards[i].classList.toggle("is-on", on);
+      });
+    }
+
+    return { set, endL, cards };
+  }
+
+  // =========================
+  // DÉFILEMENT, EN-TÊTE, MENU MOBILE
+  // =========================
+
+  const header = $(".site-header");
+  const progress = $(".progress");
+  const floatCall = $(".float-call");
+  const hero = $(".hero");
+  const burger = $(".burger");
+  const overlay = $("#menu-overlay");
+
+  let lenis = null;
+  let scrollVel = 0;
+  let scrollDir = 1;
+  let lastY = 0;
+
+  function onScroll(y) {
+    const dir = y > lastY ? 1 : y < lastY ? -1 : 0;
+    header.classList.toggle("is-scrolled", y > 30);
+    if (!root.classList.contains("menu-open")) {
+      if (dir === 1 && y > 260) header.classList.add("is-hidden");
+      else if (dir === -1) header.classList.remove("is-hidden");
+    }
+    const max = root.scrollHeight - window.innerHeight;
+    progress.style.transform = `scaleX(${max > 0 ? Math.min(y / max, 1) : 0})`;
+    floatCall.classList.toggle("is-visible", y > hero.offsetHeight * 0.6);
+    lastY = y;
+  }
+
+  function setMenu(open) {
+    root.classList.toggle("menu-open", open);
+    burger.setAttribute("aria-expanded", open);
+    burger.setAttribute("aria-label", open ? "Fermer le menu" : "Ouvrir le menu");
+    overlay.setAttribute("aria-hidden", !open);
+    if (open) header.classList.remove("is-hidden");
+    if (lenis) open ? lenis.stop() : lenis.start();
+    else document.body.style.overflow = open ? "hidden" : "";
+  }
+
+  const closeMenu = () => root.classList.contains("menu-open") && setMenu(false);
+
+  burger.addEventListener("click", () => setMenu(!root.classList.contains("menu-open")));
+  document.addEventListener("keydown", (e) => e.key === "Escape" && closeMenu());
+
+  // Ancres : défilement doux
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const id = a.getAttribute("href");
+    const target = id === "#" || id === "#accueil" ? 0 : $(id);
+    if (target === null) return;
+    e.preventDefault();
+    closeMenu();
+    if (lenis) {
+      lenis.scrollTo(target, { duration: 1.6 });
+    } else if (target === 0) {
+      window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+    } else {
+      target.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+    }
+  });
+
+  // =========================
+  // EFFET MAGNÉTIQUE
+  // =========================
+
+  function initMagnetic() {
+    $$(".magnetic").forEach((el) => {
+      const k = el.classList.contains("call") ? 0.4 : 0.28;
+      const xTo = gsap.quickTo(el, "x", { duration: 0.9, ease: "elastic.out(1, 0.35)" });
+      const yTo = gsap.quickTo(el, "y", { duration: 0.9, ease: "elastic.out(1, 0.35)" });
+      el.addEventListener("pointermove", (e) => {
+        const r = el.getBoundingClientRect();
+        xTo((e.clientX - r.left - r.width / 2) * k);
+        yTo((e.clientY - r.top - r.height / 2) * k);
+      });
+      el.addEventListener("pointerleave", () => {
+        xTo(0);
+        yTo(0);
+      });
+    });
+  }
+
+  // =========================
+  // BANDEAUX DÉFILANTS
+  // =========================
+
+  function initMarquees() {
+    const items = $$("[data-marquee]").map((m) => {
+      const track = $(".marquee-track", m);
+      return { m, track, html: track.innerHTML, dir: +m.dataset.marquee, x: 0, period: 1 };
+    });
+
+    const measure = () =>
+      items.forEach((it) => {
+        it.track.innerHTML = it.html;
+        it.period = it.track.offsetWidth || 1;
+        const copies = Math.ceil((it.m.offsetWidth * 2) / it.period) + 1;
+        it.track.innerHTML = it.html.repeat(copies);
+      });
+
+    measure();
+    window.addEventListener("resize", debounce(measure, 200));
+    if (document.fonts) document.fonts.ready.then(measure);
+
+    gsap.ticker.add((time, delta) => {
+      const boost = 1 + Math.min(Math.abs(scrollVel) * 0.08, 6);
+      items.forEach((it) => {
+        it.x -= it.dir * scrollDir * 0.9 * boost * (delta / 16.67);
+        if (it.x <= -it.period) it.x += it.period;
+        else if (it.x > 0) it.x -= it.period;
+        it.track.style.transform = `translate3d(${f(it.x)}px,0,0)`;
+      });
+    });
+  }
+
+  // =========================
+  // CHORÉGRAPHIE
+  // =========================
+
+  function heroIntro() {
+    const tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
+    tl.from(".site-header > :not(.nav)", { y: -40, opacity: 0, duration: 1.2, stagger: 0.08 }, 0.1)
+      .from(".nav a", { y: -30, opacity: 0, duration: 1.2, stagger: 0.06 }, 0.2)
+      .from(".pizza-wrap", { scale: 0.45, rotate: -150, opacity: 0, duration: 2.4 }, 0)
+      .from(".hero-eyebrow", { y: 20, opacity: 0, duration: 1.1 }, 0.1)
+      .from(".today-badge", { y: 20, opacity: 0, duration: 1.1 }, 0.2)
+      .from(".hero-town .char", { yPercent: 118, rotate: 7, duration: 1.5, stagger: 0.04 }, 0.25)
+      .from([".today-hours", ".hero-actions > *"], { y: 30, opacity: 0, duration: 1.3, stagger: 0.08 }, 0.6)
+      .from(".badge", { scale: 0, rotate: -200, duration: 1.6 }, 0.8)
+      .from(".scroll-hint", { opacity: 0, y: -10, duration: 1 }, 1.2);
+    return tl;
+  }
+
+  // La petite pizza tourne le temps que les polices arrivent (0,8 s mini, 2,5 s maxi),
+  // puis l'écran s'efface et l'accueil s'anime
+  function startIntro(intro) {
+    const fontsReady = document.fonts ? Promise.race([document.fonts.ready, wait(2500)]) : Promise.resolve();
+    Promise.all([fontsReady, wait(800)]).then(() => {
+      fitTown();
+      root.classList.add("loaded");
+      ScrollTrigger.refresh();
+      gsap.delayedCall(0.25, () => intro.play());
+      if (lenis) lenis.start();
+
+      // Lien direct vers une section (ex. camionpizza.net/#carte)
+      const target = location.hash.length > 1 && document.getElementById(location.hash.slice(1));
+      if (target && target !== hero) {
+        if (lenis) lenis.scrollTo(target, { duration: 1.6 });
+        else target.scrollIntoView({ behavior: "smooth" });
+      }
+    });
+  }
+
+  function initScrollScenes(road) {
+    const fadeUp = (targets, trigger, extra = {}) =>
+      gsap.from(targets, {
+        y: 40,
+        opacity: 0,
+        duration: 1.1,
+        ease: "expo.out",
+        stagger: 0.08,
+        scrollTrigger: { trigger: trigger || targets, start: "top 88%" },
+        ...extra,
+      });
+
+    // Accueil : la pizza tourne, une part se détache
+    gsap.set(".pizza", { transformOrigin: "50% 50%" });
+    gsap.set(".pz-slice", { x: 0, y: 0 });
+    const pull = () => (window.innerWidth > 860 ? 62 : 26);
+    gsap
+      .timeline({
+        scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true, invalidateOnRefresh: true },
+      })
+      .to(".pizza", { rotate: 110, ease: "none" }, 0)
+      .to(".pz-slice", { x: () => -pull(), y: () => pull(), ease: "none" }, 0)
+      .to(".pz-slice-shadow", { opacity: 0.45, ease: "none" }, 0)
+      .to(".hero-visual", { yPercent: 16, ease: "none" }, 0);
+
+    gsap.to(".scroll-hint > *", {
+      autoAlpha: 0,
+      ease: "none",
+      scrollTrigger: { trigger: hero, start: "top top", end: "+=160", scrub: true },
+    });
+
+    // Titres lettre par lettre
+    $$(".menu-title, .tour-title, .cta-title").forEach((title) => {
+      gsap.from($$(".char", title), {
+        yPercent: 118,
+        rotate: 6,
+        duration: 1.3,
+        ease: "expo.out",
+        stagger: 0.035,
+        scrollTrigger: { trigger: title, start: "top 85%" },
+      });
+    });
+
+    const giant = $(".footer-giant");
+    gsap.from($$(".char", giant), {
+      yPercent: 105,
+      duration: 1.2,
+      ease: "expo.out",
+      stagger: 0.025,
+      scrollTrigger: { trigger: giant, start: "top 98%" },
+    });
+
+    $$(".manifesto .section-label, .menu .section-label, .tour .section-label, .cta .section-label").forEach((l) =>
+      fadeUp(l)
+    );
+
+    // Manifeste : les mots s'allument au fil du scroll
+    const words = $$(".manifesto-text .w");
+    gsap.fromTo(
+      words,
+      { opacity: 0.12 },
+      {
+        opacity: 1,
+        stagger: 0.1,
+        ease: "none",
+        scrollTrigger: { trigger: ".manifesto-text", start: "top 78%", end: "bottom 50%", scrub: true },
+      }
+    );
+
+    fadeUp(".stats li", ".stats");
+
+    // Compteurs
+    $$("[data-count]").forEach((el) => {
+      const end = parseFloat(el.dataset.count);
+      const dec = +(el.dataset.decimals || 0);
+      const fmt = (v) => (dec ? v.toFixed(dec).replace(".", ",") : String(Math.round(v)));
+      const o = { v: 0 };
+      el.textContent = fmt(0);
+      gsap.to(o, {
+        v: end,
+        duration: 2,
+        ease: "power3.out",
+        scrollTrigger: { trigger: el, start: "top 92%" },
+        onUpdate: () => (el.textContent = fmt(o.v)),
+      });
+    });
+
+    // Carte
+    fadeUp([".menu-aside", ".tabs"], ".menu-head");
+    gsap.from(list.children, {
+      y: 30,
+      opacity: 0,
+      duration: 0.9,
+      stagger: 0.03,
+      ease: "expo.out",
+      scrollTrigger: { trigger: list, start: "top 85%" },
+    });
+
+    // Tournée
+    fadeUp(".tour-intro");
+
+    // Contact
+    fadeUp([".cta-text", ".cta-phone"], ".cta-text");
+    gsap.from(".call", {
+      scale: 0,
+      rotate: -120,
+      duration: 1.5,
+      ease: "expo.out",
+      scrollTrigger: { trigger: ".call", start: "top 92%" },
+    });
+
+    fadeUp(".footer-grid > *", ".footer-grid");
+
+    const mm = gsap.matchMedia();
+
+    mm.add("(min-width: 861px)", () => {
+      // Le texte d'accueil s'efface en remontant
+      gsap.to(".hero-content", {
+        yPercent: -14,
+        opacity: 0.1,
+        ease: "none",
+        scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true },
+      });
+
+      // Les panneaux s'élargissent en arrivant
+      [".menu", ".tour"].forEach((sel) => {
+        gsap.fromTo(
+          sel,
+          { clipPath: "inset(5% 3.5% 0% 3.5% round 56px 56px 0px 0px)" },
+          {
+            clipPath: "inset(0% 0% 0% 0% round 56px 56px 0px 0px)",
+            ease: "none",
+            scrollTrigger: { trigger: sel, start: "top bottom", end: "top 30%", scrub: true },
+          }
+        );
+      });
+
+      // Le camion roule au fil du scroll
+      const state = { L: 0 };
+      road.set(0);
+      gsap.to(state, {
+        L: road.endL,
+        ease: "none",
+        scrollTrigger: { trigger: ".road-wrap", start: "top 80%", end: "bottom 15%", scrub: 0.8 },
+        onUpdate: () => road.set(state.L),
+      });
+
+      // Légère inclinaison de la pizza suivant la souris
+      if (finePointer) {
+        const hv = $(".hero-visual");
+        gsap.set(hv, { transformPerspective: 1400 });
+        const tx = gsap.quickTo(hv, "rotationY", { duration: 1.4, ease: "power3" });
+        const ty = gsap.quickTo(hv, "rotationX", { duration: 1.4, ease: "power3" });
+        const move = (e) => {
+          tx((e.clientX / window.innerWidth - 0.5) * 16);
+          ty(-(e.clientY / window.innerHeight - 0.5) * 16);
+        };
+        hero.addEventListener("pointermove", move);
+        return () => hero.removeEventListener("pointermove", move);
+      }
+    });
+
+    mm.add("(max-width: 860px)", () => {
+      gsap.fromTo(
+        ".stops-fill",
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          ease: "none",
+          scrollTrigger: { trigger: "#stops", start: "top 70%", end: "bottom 70%", scrub: 0.6 },
+        }
+      );
+      const cards = road.cards;
+      cards.forEach((c) => c.classList.remove("is-on"));
+      cards.forEach((c) =>
+        ScrollTrigger.create({
+          trigger: c,
+          start: "top 72%",
+          onEnter: () => c.classList.add("is-on"),
+          onLeaveBack: () => c.classList.remove("is-on"),
+        })
+      );
+      return () => cards.forEach((c) => c.classList.remove("is-on"));
+    });
+  }
+
+  // =========================
+  // DÉMARRAGE
+  // =========================
+
+  renderStatus();
+  renderStops();
+  renderMenu(current);
+  buildPizza($("#pizza"));
+  $$("[data-split]").forEach(splitChars);
+  splitWords($(".manifesto-text"));
+  setInterval(renderStatus, 60000);
+
+  const road = initRoad();
+
+  moveIndicator();
+  requestAnimationFrame(() => tabsEl.classList.add("is-ready"));
+  menuBlob.style.backgroundColor = catColor[current];
+  window.addEventListener(
+    "resize",
+    debounce(() => {
+      moveIndicator();
+      fitTown();
+    }, 120)
+  );
+  if (document.fonts)
+    document.fonts.ready.then(() => {
+      moveIndicator();
+      fitTown();
+    });
+
+  if (!motion) {
+    // Version sans animation : tout est visible, le camion est garé à la dernière étape
+    road.set(road.endL);
+    root.classList.add("loaded");
+    window.addEventListener("scroll", () => onScroll(window.scrollY), { passive: true });
+    onScroll(window.scrollY);
+    return;
+  }
+
+  root.classList.add("motion-on");
+  gsap.registerPlugin(ScrollTrigger);
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  window.scrollTo(0, 0);
+
+  if (window.Lenis) {
+    lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    lenis.on("scroll", (l) => {
+      ScrollTrigger.update();
+      onScroll(l.scroll);
+      scrollVel = l.velocity;
+      if (Math.abs(l.velocity) > 0.3 && l.direction) scrollDir = l.direction;
+    });
+    gsap.ticker.add((t) => lenis.raf(t * 1000));
+    gsap.ticker.lagSmoothing(0);
+    lenis.stop();
+  } else {
     window.addEventListener(
       "scroll",
       () => {
-        if (!ticking) {
-          ticking = true;
-          requestAnimationFrame(update);
-        }
+        const y = window.scrollY;
+        scrollVel = y - lastY;
+        if (y !== lastY) scrollDir = y > lastY ? 1 : -1;
+        onScroll(y);
       },
       { passive: true }
     );
-    update();
   }
 
-  // Grands titres découpés en lettres (elles montent une à une quand le titre apparaît)
-  function splitTitle(h) {
-    let i = 0;
-    const walk = (node) => {
-      [...node.childNodes].forEach((n) => {
-        if (n.nodeType === 1) return walk(n);
-        if (n.nodeType !== 3 || !n.textContent.trim()) return;
-        const frag = document.createDocumentFragment();
-        n.textContent.split(/( +)/).forEach((word) => {
-          if (!word) return;
-          if (!word.trim()) return frag.appendChild(document.createTextNode(" "));
-          const w = document.createElement("span");
-          w.className = "w";
-          for (const c of word) {
-            const ch = document.createElement("span");
-            ch.className = "ch";
-            ch.style.setProperty("--i", i++);
-            ch.textContent = c;
-            w.appendChild(ch);
-          }
-          frag.appendChild(w);
-        });
-        n.replaceWith(frag);
-      });
-    };
-    h.setAttribute("aria-label", h.textContent.replace(/\s+/g, " ").trim());
-    walk(h);
-    h.classList.add("split");
-  }
-  document.querySelectorAll("h2").forEach(splitTitle);
+  new Embers($('[data-embers="hero"]'), { interactive: finePointer, density: 0.55 });
 
-  // Le bandeau est doublé pour défiler sans trou, même sur grand écran
-  const band = $(".band-track");
-  if (band) band.innerHTML += band.innerHTML;
+  initMarquees();
+  if (finePointer) initMagnetic();
 
-  buildPizza($("#pizza"));
-  render();
-  initReveal();
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) initScroll();
-  setInterval(render, 60000);
+  const intro = heroIntro();
+  initScrollScenes(road);
+  startIntro(intro);
 })();
